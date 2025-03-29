@@ -4,13 +4,11 @@ from fpdf import FPDF
 import tempfile
 import zipfile
 import os
-import shutil  
-
+import shutil 
 # Função para gerar o PDF
 def gerar_pdf(dados, nome_arquivo):
     # Garantir que o diretório temp_pdfs exista
     os.makedirs('temp_pdfs', exist_ok=True)
-    
     # Configuração da página
     pdf = FPDF(orientation='L', unit='mm', format='A4')  
     pdf.set_auto_page_break(auto=True, margin=15)
