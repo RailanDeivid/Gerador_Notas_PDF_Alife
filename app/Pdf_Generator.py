@@ -4,7 +4,7 @@ from fpdf import FPDF
 import tempfile
 import zipfile
 import os
-import shutil  # Importando shutil para remover diretórios não vazios
+import shutil  
 
 # Função para gerar o PDF
 def gerar_pdf(dados, nome_arquivo):
