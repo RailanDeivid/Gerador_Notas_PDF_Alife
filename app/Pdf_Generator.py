@@ -14,18 +14,18 @@ def gerar_pdf(dados, nome_arquivo):
     pdf.set_auto_page_break(auto=True, margin=15)
     pdf.add_page()
     
-    # Definindo a fonte do título
-    pdf.set_font("Arial", "B", 18)
+    
     # Título
+    pdf.set_font("Arial", "B", 18)
     pdf.set_text_color(0, 0, 0)  
     pdf.set_fill_color(132, 183, 83)  
     pdf.cell(280, 10, "NOTA DE DÉBITO", ln=True, align='C', border=1, fill=True)
     pdf.ln(20)
     
-    # Fonte do texto
-    pdf.set_font("Arial", "", 10)
+
     
-    # Dados do Destinatário - Alinhados à esquerda
+    # Dados casa pagantet e
+    pdf.set_font("Arial", "", 10)
     pdf.set_xy(10, 30) 
     pdf.cell(100, 5, f"{dados['LOJA']}", ln=True)
     pdf.ln(2)
@@ -35,16 +35,16 @@ def gerar_pdf(dados, nome_arquivo):
     pdf.cell(100, 5, f"CNPJ: {dados['CNPJ']}", ln=True)
     pdf.cell(100, 5, f"E-mail: {dados['EMAIL']}", ln=True)
     
-    # Ajustando a posição para o lado direito
-    pdf.set_xy(120, 45) 
+    # Dados Destinatário 
+    pdf.set_xy(118, 45) 
     pdf.cell(200, 10, f"CNPJ: 11513881000160", ln=True)
-    pdf.set_xy(120, 50)
+    pdf.set_xy(118, 50)
     pdf.cell(200, 10, f"Rua AUGUSTA, 3000", ln=True)
-    pdf.set_xy(120, 55)
+    pdf.set_xy(118, 55)
     pdf.cell(200, 10, f"CERQUEIRA CESAR - São Paulo / SP", ln=True)
-    pdf.set_xy(120, 60)
+    pdf.set_xy(118, 60)
     pdf.cell(200, 10, f"CEP: 01.412-100", ln=True)
-    pdf.set_xy(120, 65)
+    pdf.set_xy(118, 65)
     pdf.cell(200, 10, f"E-mail: laiane.costa@alifegroup.com.br", ln=True)
     
     # Cabeçalho acima da tabela
@@ -54,12 +54,18 @@ def gerar_pdf(dados, nome_arquivo):
     pdf.cell(60, 5, 'Nº', ln=True, align='C', border=1, fill=True)
     
     # Cabeçalho da tabela 
-    pdf.set_xy(190, 30) 
+    pdf.set_xy(187, 30) 
     pdf.set_text_color(0, 0, 0)
     pdf.set_font("Arial", "B", 11)
-    pdf.cell(40, 10, 'Nota de Débito', border=1, align='C')
-    pdf.set_xy(190, 40) 
-    pdf.cell(40, 10, 'Emissão', border=1, align='C')
+    pdf.cell(43, 10, 'Nota de Débito', border=1, align='C')
+    pdf.set_xy(187, 40) 
+    pdf.cell(43, 10, 'Emissão', border=1, align='C')
+    pdf.set_xy(187, 50) 
+    pdf.cell(43, 10, 'Vencimento', border=1, align='C')
+    pdf.set_xy(187, 60) 
+    pdf.cell(43, 10, 'Finalidade', border=1, align='C')
+    pdf.set_xy(187, 70) 
+    pdf.cell(43, 10, 'Forma de pagamento', border=1, align='C')
     
     # Valores da tabela
     pdf.set_font("Arial", "", 11)
@@ -67,6 +73,42 @@ def gerar_pdf(dados, nome_arquivo):
     pdf.cell(60, 10, "0001", border=1, ln=True, align='C')
     pdf.set_xy(230, 40) 
     pdf.cell(60, 10, "23/03/2025", border=1, ln=True, align='C')
+    pdf.set_xy(230, 50) 
+    pdf.cell(60, 10, "23/03/2025", border=1, ln=True, align='C')
+    pdf.set_xy(230, 60) 
+    pdf.cell(60, 10, "Extras", border=1, ln=True, align='C')
+    pdf.set_xy(230, 70) 
+    pdf.cell(60, 10, "À Vista", border=1, ln=True, align='C')
+    pdf.ln(20)
+    
+    
+    # Titulo parte inferior
+    pdf.set_text_color(0, 0, 0)  
+    pdf.set_fill_color(132, 183, 83) 
+    pdf.set_font("Arial", "B", 14) 
+    pdf.cell(280, 10, "DESTINATÁRIO", ln=True, align='L', border=1, fill=True)
+
+    # Dados Destinatário parte inferior 
+    pdf.set_font("Arial", "B", 11)
+    pdf.cell(200, 10, f"Alife Group", ln=True)
+    pdf.set_font("Arial", "", 11)
+    pdf.cell(200, 5, f"CNPJ: 11513881000160", ln=True)
+    pdf.cell(200, 5, f"Rua AUGUSTA, 3000", ln=True)
+    pdf.cell(200, 5, f"CERQUEIRA CESAR - São Paulo / SP", ln=True)
+    pdf.cell(200, 5, f"CEP: 01.412-100", ln=True)
+    pdf.cell(200, 5, f"E-mail: laiane.costa@alifegroup.com.br", ln=True)
+    pdf.ln(10)
+    
+    
+    # Titulo tabvela parte inferior
+    pdf.set_text_color(0, 0, 0)  
+    pdf.set_fill_color(132, 183, 83) 
+    pdf.set_font("Arial", "B", 14) 
+    pdf.cell(280, 10, "DESTINATÁRIO", ln=True, align='C', border=1, fill=True)
+    pdf.set_fill_color(132, 183, 185) 
+    pdf.cell(280, 10, "DESTINATÁRIO", ln=True, align='C', border=1, fill=True)
+    
+    
     
     # Salvar o PDF temporariamente
     temp_pdf = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf", dir="temp_pdfs")
