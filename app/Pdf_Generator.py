@@ -5,8 +5,18 @@ import tempfile
 import zipfile
 import os
 import shutil 
+import locale
+# Define o locale para formato brasileiro
+locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
+
+# Variável global para o número da nota
+numero_nota = 1
+
 # Função para gerar o PDF
 def gerar_pdf(dados, nome_arquivo):
+    
+    global numero_nota  # Usa a variável global
+    
     # Garantir que o diretório temp_pdfs exista
     os.makedirs('temp_pdfs', exist_ok=True)
     # Configuração da página
@@ -70,17 +80,20 @@ def gerar_pdf(dados, nome_arquivo):
     # Valores da tabela
     pdf.set_font("Arial", "", 11)
     pdf.set_xy(230, 30) 
-    pdf.cell(60, 10, "0001", border=1, ln=True, align='C')
+    numero_nota_str = str(numero_nota).zfill(4) 
+    pdf.cell(60, 10, numero_nota_str, border=1, ln=True, align='C')
     pdf.set_xy(230, 40) 
-    pdf.cell(60, 10, "23/03/2025", border=1, ln=True, align='C')
+    pdf.cell(60, 10, f"{dados['Data de emissão'].strftime('%d/%m/%Y')}", border=1, ln=True, align='C')
     pdf.set_xy(230, 50) 
-    pdf.cell(60, 10, "23/03/2025", border=1, ln=True, align='C')
+    pdf.cell(60, 10, f"{dados['Data de Pagamento'].strftime('%d/%m/%Y')}", border=1, ln=True, align='C')
     pdf.set_xy(230, 60) 
     pdf.cell(60, 10, "Extras", border=1, ln=True, align='C')
     pdf.set_xy(230, 70) 
     pdf.cell(60, 10, "À Vista", border=1, ln=True, align='C')
     pdf.ln(20)
     
+    # Incrementar o número da nota após gerar o PDF
+    numero_nota += 1
     
     # Titulo parte inferior
     pdf.set_text_color(0, 0, 0)  
@@ -100,14 +113,59 @@ def gerar_pdf(dados, nome_arquivo):
     pdf.ln(10)
     
     
-    # Titulo tabvela parte inferior
+    # Titulo tabela parte inferior
     pdf.set_text_color(0, 0, 0)  
     pdf.set_fill_color(132, 183, 83) 
     pdf.set_font("Arial", "B", 14) 
-    pdf.cell(280, 10, "DESTINATÁRIO", ln=True, align='C', border=1, fill=True)
-    pdf.set_fill_color(132, 183, 185) 
-    pdf.cell(280, 10, "DESTINATÁRIO", ln=True, align='C', border=1, fill=True)
+    pdf.cell(280, 8, "DESCRIÇÃO", ln=True, align='C', border=1, fill=True)
+    pdf.set_font("Arial", "B", 12) 
+    pdf.set_fill_color(183, 225, 205) 
+    pdf.cell(280, 5, "NOTA DE DEBITO", ln=True, align='C', border=1, fill=True)
+    pdf.set_font("Arial", "B", 14) 
+    pdf.set_fill_color(132, 183, 83)
+    pdf.cell(280, 8, "PRESTAÇÃO DE CONTAS", ln=True, align='L', border=1, fill=True)
+    pdf.set_font("Arial", "B", 12)
+    pdf.set_fill_color(218, 255, 183) 
     
+    # Cabeçalhos da tabela Inferior
+    pdf.cell(30, 5, "Item", ln=True, align='C', border=1, fill=True)
+    pdf.set_xy(40, 176) 
+    pdf.cell(40, 5, "Descrição", ln=True, align='C', border=1, fill=True)
+    pdf.set_xy(80, 176) 
+    pdf.cell(30, 5, "Quant.", ln=True, align='C', border=1, fill=True)
+    pdf.set_xy(110, 176) 
+    pdf.cell(30, 5, "Unit.", ln=True, align='C', border=1, fill=True)
+    pdf.set_xy(140, 176) 
+    pdf.cell(50, 5, "Prestador de Serviço", ln=True, align='C', border=1, fill=True)
+    pdf.set_xy(190, 176) 
+    pdf.cell(40, 5, "Valor.", ln=True, align='C', border=1, fill=True)
+    pdf.set_xy(230, 176) 
+    pdf.cell(60, 5, "Observações", ln=True, align='C', border=1, fill=True)
+    
+    # Valores tabela Inferior
+    pdf.cell(30, 5, "1", ln=True, align='C', border=1)
+    pdf.set_xy(40, 181) 
+    pdf.cell(40, 5, "Extras", ln=True, align='C', border=1)
+    pdf.set_xy(80, 181) 
+    pdf.cell(30, 5, "1", ln=True, align='C', border=1)
+    pdf.set_xy(110, 181) 
+    pdf.cell(30, 5, "1", ln=True, align='C', border=1)
+    pdf.set_xy(140, 181) 
+    pdf.cell(50, 5, "Extras", ln=True, align='C', border=1)
+    pdf.set_xy(190, 181)
+    pdf.cell(40, 5, f"R$ {locale.format_string('%.2f', dados['VALOR'], grouping=True)}", ln=True, align='C', border=1)
+    pdf.set_xy(230, 181) 
+    pdf.cell(60, 5, "1", ln=True, align='C', border=1)
+    
+    
+    pdf.set_text_color(0, 0, 0)  
+    pdf.set_fill_color(132, 183, 83) 
+    pdf.set_font("Arial", "B", 14) 
+    pdf.cell(280, 8, "", ln=True, align='C', border=1, fill=True)
+    pdf.set_xy(101, 188)
+    pdf.cell(20, 5, "TOTAL", ln=True, align='C')
+    pdf.set_xy(200, 188)
+    pdf.cell(20, 5, f"R$ {locale.format_string('%.2f', dados['VALOR'], grouping=True)}", ln=True, align='C')
     
     
     # Salvar o PDF temporariamente
@@ -158,23 +216,43 @@ st.markdown("<br>", unsafe_allow_html=True)
 
 
 # ------------------- Upload do arquivo Excel
+
 arquivo = st.file_uploader("Envie o arquivo Excel", type=["xlsx"])
+
+
 
 # ------------------- Verifica se o arquivo foi enviado
 if arquivo:
+    
     df = pd.read_excel(arquivo)
-    st.write("Dados carregados:")
-    st.dataframe(df)
-    
-    # Escolher se quer gerar todos ou selecionar manualmente
-    opcao = st.radio("Escolha uma opção:", ("Gerar todos os PDFs", "Escolher quais gerar"),horizontal=True)
-    
-    if opcao == "Escolher quais gerar":
-        # Checkbox para selecionar os PDFs individuais
-        cols = st.columns(1)
-        with cols[0]:
-            selecao = st.multiselect("Selecione as lojas para gerar PDF", df['LOJA'].tolist())
-    
+    if df.empty:
+            st.error("O arquivo Excel está vazio. Por favor, verifique os dados.")
+    else:
+        st.write("Dados carregados:")
+        st.dataframe(df)    
+        
+        # Escolher se quer gerar todos ou selecionar manualmente
+        opcao = st.radio("Escolha uma opção:", ("Gerar todos os PDFs", "Escolher quais gerar"),horizontal=True)
+        
+        if opcao == "Escolher quais gerar":
+            # Checkbox para selecionar os PDFs individuais
+            cols = st.columns(3)
+            with cols[0]:
+                loja_selecionada = st.selectbox("Selecione a loja para gerar o PDF", df['LOJA'].tolist())
+                # selecao = st.multiselect("Selecione as lojas para gerar PDF", df['LOJA'].tolist())
+
+            # Perguntar se deseja inserir manualmente o número da nota
+            numero_manual = st.radio("Deseja inserir manualmente o número da nota?", ("Não", "Sim"))
+
+            if numero_manual == "Sim":
+                # Se escolher "Sim", permitir que o usuário insira o número manualmente
+                cols = st.columns(3)
+                with cols[0]:
+                    numero_nota_input = st.text_input("Insira o número da nota (0000):", value=str(numero_nota), max_chars=4)
+                if numero_nota_input:
+                    numero_nota = int(numero_nota_input)  # Atualiza a variável global com o número manual inserido
+
+    # Agora, exibe o botão "Gerar PDF" após o número ser inserido ou caso não queira inserir
     if st.button("Gerar PDF"):
         if not df.empty:
             if opcao == "Gerar todos os PDFs":
@@ -186,16 +264,27 @@ if arquivo:
                         file_name="notas_de_debito.zip",
                         mime="application/zip"
                     )
+            # elif opcao == "Escolher quais gerar":
+            #     for loja in selecao:
+            #         row = df[df['LOJA'] == loja].iloc[0]
+            #         pdf_path = gerar_pdf(row, f"NOTA_DÉBITO_{row['LOJA']}")
+            #         with open(pdf_path, "rb") as f:
+            #             st.download_button(
+            #                 label=f"Baixar Nota de Débito - {loja}",
+            #                 data=f,
+            #                 file_name=f"NOTA DÉBITO - {loja}.pdf",  
+            #                 mime="application/pdf"
+            #             )
             elif opcao == "Escolher quais gerar":
-                for loja in selecao:
-                    row = df[df['LOJA'] == loja].iloc[0]
-                    pdf_path = gerar_pdf(row, f"NOTA_DÉBITO_{row['LOJA']}")
-                    with open(pdf_path, "rb") as f:
-                        st.download_button(
-                            label=f"Baixar Nota de Débito - {loja}",
-                            data=f,
-                            file_name=f"NOTA DÉBITO - {loja}.pdf",  
-                            mime="application/pdf"
-                        )
+                # Selecionar a linha da loja escolhida
+                row = df[df['LOJA'] == loja_selecionada].iloc[0]
+                pdf_path = gerar_pdf(row, f"NOTA_DÉBITO_{row['LOJA']}")
+                with open(pdf_path, "rb") as f:
+                    st.download_button(
+                        label=f"Baixar PDF da {loja_selecionada}",
+                        data=f,
+                        file_name=f"NOTA_DEBITO_{loja_selecionada}.pdf",
+                        mime="application/pdf"
+                    )
         else:
             st.error("O arquivo Excel está vazio. Verifique os dados e tente novamente.")
