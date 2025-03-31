@@ -201,7 +201,7 @@ st.markdown("""
         .rounded-title {
             text-align: center; 
             font-size: 40px;
-            color: #4CAF50;
+            color: #EF722A;
         }
     </style>
     """, unsafe_allow_html=True)
