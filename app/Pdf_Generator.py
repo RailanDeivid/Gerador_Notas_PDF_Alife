@@ -162,7 +162,8 @@ def gerar_pdf(dados, nome_arquivo):
     pdf.set_xy(140, 181) 
     pdf.cell(50, 5, "Extras", ln=True, align='C', border=1)
     pdf.set_xy(190, 181)
-    pdf.cell(40, 5, f"R$ {dados['VALOR']:.2f}".replace('.', ','), ln=True, align='C', border=1)
+    valor_formatado = f"R$ {dados['VALOR']:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
+    pdf.cell(40, 5, valor_formatado, ln=True, align='C', border=1)
     pdf.set_xy(230, 181) 
     pdf.cell(60, 5, "", ln=True, align='C', border=1)
     
@@ -175,8 +176,6 @@ def gerar_pdf(dados, nome_arquivo):
     pdf.cell(20, 5, "TOTAL", ln=True, align='C')
     pdf.set_xy(190, 188)
     # pdf.cell(40, 5, f"R$ {dados['VALOR']:.2f}".replace('.', ','), ln=True, align='C')
-    valor_formatado = f"R$ {dados['VALOR']:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
-
     pdf.cell(40, 5, valor_formatado, ln=True, align='C')
 
     
