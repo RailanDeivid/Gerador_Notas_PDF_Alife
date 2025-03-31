@@ -251,8 +251,8 @@ if arquivo:
                 # Checkbox para selecionar os PDFs individuais
                 cols = st.columns(3)
                 with cols[0]:
-                    loja_selecionada = st.selectbox("Selecione a loja para gerar o PDF", df['LOJA'].tolist())
-                    # selecao = st.multiselect("Selecione as lojas para gerar PDF", df['LOJA'].tolist())
+                    # loja_selecionada = st.selectbox("Selecione a loja para gerar o PDF", df['LOJA'].tolist())
+                    selecao = st.multiselect("Selecione as lojas para gerar PDF", df['LOJA'].tolist())
 
                 # # Perguntar se deseja inserir manualmente o número da nota
                 # numero_manual = st.radio("Deseja inserir manualmente o número da nota?", ("Não", "Sim"))
@@ -277,27 +277,27 @@ if arquivo:
                         file_name="notas_de_debito.zip",
                         mime="application/zip"
                     )
-            # elif opcao == "Escolher quais gerar":
-            #     for loja in selecao:
-            #         row = df[df['LOJA'] == loja].iloc[0]
-            #         pdf_path = gerar_pdf(row, f"NOTA_DÉBITO_{row['LOJA']}")
-            #         with open(pdf_path, "rb") as f:
-            #             st.download_button(
-            #                 label=f"Baixar Nota de Débito - {loja}",
-            #                 data=f,
-            #                 file_name=f"NOTA DÉBITO - {loja}.pdf",  
-            #                 mime="application/pdf"
-            #             )
             elif opcao == "Escolher quais gerar":
-                # Selecionar a linha da loja escolhida
-                row = df[df['LOJA'] == loja_selecionada].iloc[0]
-                pdf_path = gerar_pdf(row, f"NOTA_DÉBITO_{row['LOJA']}")
-                with open(pdf_path, "rb") as f:
-                    st.download_button(
-                        label=f"Baixar PDF da {loja_selecionada}",
-                        data=f,
-                        file_name=f"NOTA_DEBITO_{loja_selecionada}.pdf",
-                        mime="application/pdf"
-                    )
+                for loja in selecao:
+                    row = df[df['LOJA'] == loja].iloc[0]
+                    pdf_path = gerar_pdf(row, f"NOTA_DÉBITO_{row['LOJA']}")
+                    with open(pdf_path, "rb") as f:
+                        st.download_button(
+                            label=f"Baixar Nota de Débito - {loja}",
+                            data=f,
+                            file_name=f"NOTA DÉBITO - {loja}.pdf",  
+                            mime="application/pdf"
+                        )
+            # elif opcao == "Escolher quais gerar":
+            #     # Selecionar a linha da loja escolhida
+            #     row = df[df['LOJA'] == loja_selecionada].iloc[0]
+            #     pdf_path = gerar_pdf(row, f"NOTA_DÉBITO_{row['LOJA']}")
+            #     with open(pdf_path, "rb") as f:
+            #         st.download_button(
+            #             label=f"Baixar PDF da {loja_selecionada}",
+            #             data=f,
+            #             file_name=f"NOTA_DEBITO_{loja_selecionada}.pdf",
+            #             mime="application/pdf"
+            #         )
         else:
             st.error("O arquivo Excel está vazio. Verifique os dados e tente novamente.")
