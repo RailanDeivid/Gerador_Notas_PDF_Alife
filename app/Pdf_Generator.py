@@ -214,9 +214,8 @@ st.markdown("<br>", unsafe_allow_html=True)
 
 
 # ------------------- Upload do arquivo Excel
-cols = st.columns(2)
-with cols[0]:
-    arquivo = st.file_uploader("Envie o arquivo Excel", type=["xlsx"])
+
+arquivo = st.file_uploader("Envie o arquivo Excel", type=["xlsx"])
 
 
 
