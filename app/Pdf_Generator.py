@@ -195,17 +195,17 @@ def gerar_zip_com_pdfs(df):
 # ----------------------- Configuração da página
 st.set_page_config(page_title="Gerador de Notas de Débito em PDF",
                    page_icon="📄", layout="wide", initial_sidebar_state="expanded")
+# Setar título
 st.markdown("""
     <style>
-        .text {
-            text-align: center; /* Centraliza o texto */
+        .rounded-title {
+            text-align: center; 
             font-size: 40px;
-            color: #E67206FF;
-            
         }
     </style>
     """, unsafe_allow_html=True)
-st.markdown("<h1 class='text'>Gerador de Notas de Débito em PDF</h1><br>", unsafe_allow_html=True)
+
+st.markdown("<h1 class='rounded-title'>Gerador de Notas de Débito em PDF</h1><br>", unsafe_allow_html=True)
 st.markdown("<br>", unsafe_allow_html=True)
 
 
