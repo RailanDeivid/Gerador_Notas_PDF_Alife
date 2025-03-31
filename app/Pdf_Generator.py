@@ -30,10 +30,9 @@ def gerar_pdf(dados, nome_arquivo):
     pdf.set_fill_color(132, 183, 83)  
     pdf.cell(280, 10, "NOTA DE DÉBITO", ln=True, align='C', border=1, fill=True)
     pdf.ln(20)
-    
 
     
-    # Dados casa pagant
+    # Dados casa pagante
     pdf.set_font("Arial", "", 10)
     pdf.set_xy(10, 30) 
     pdf.cell(100, 5, f"{dados['LOJA']}", ln=True)
