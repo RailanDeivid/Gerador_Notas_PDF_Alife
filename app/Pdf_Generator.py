@@ -151,7 +151,7 @@ def gerar_pdf(dados, nome_arquivo):
     pdf.set_xy(140, 181) 
     pdf.cell(50, 5, "Extras", ln=True, align='C', border=1)
     pdf.set_xy(190, 181)
-    pdf.cell(40, 5, f"{row['VALOR']:.2f}", ln=True, align='C', border=1)
+    pdf.cell(40, 5, f"{dados['VALOR']:.2f}", ln=True, align='C', border=1)
     pdf.set_xy(230, 181) 
     pdf.cell(60, 5, "1", ln=True, align='C', border=1)
     
@@ -163,7 +163,7 @@ def gerar_pdf(dados, nome_arquivo):
     pdf.set_xy(101, 188)
     pdf.cell(20, 5, "TOTAL", ln=True, align='C')
     pdf.set_xy(200, 188)
-    pdf.cell(40, 5, f"{row['VALOR']:.2f}", ln=True, align='C', border=1)
+    pdf.cell(40, 5, f"{dados['VALOR']:.2f}", ln=True, align='C', border=1)
 
     
     
