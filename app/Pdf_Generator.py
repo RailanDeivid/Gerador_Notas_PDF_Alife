@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import numpy as np
 from fpdf import FPDF
 import tempfile
 import zipfile
@@ -59,7 +60,7 @@ def gerar_pdf(dados, nome_arquivo):
     pdf.cell(100, 5, f"CEP: {dados['CEP']}", ln=True)
     # pdf.cell(100, 5, f"BAIRRO: {dados['BAIRRO']}", ln=True)
     pdf.cell(100, 5, f"CNPJ: {dados['CNPJ']}", ln=True)
-    if dados.get('EMAIL') is not None:  
+    if dados.get('EMAIL') is not np.nan:  
         pdf.cell(100, 5, f"E-mail: {dados['EMAIL']}", ln=True)
 
 
