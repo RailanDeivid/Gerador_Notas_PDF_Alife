@@ -58,7 +58,6 @@ def gerar_pdf(dados, nome_arquivo):
     pdf.ln(2)
     pdf.cell(100, 5, f"ENDEREÇO: {dados['ENDEREÇO']}", ln=True)
     pdf.cell(100, 5, f"CEP: {dados['CEP']}", ln=True)
-    # pdf.cell(100, 5, f"BAIRRO: {dados['BAIRRO']}", ln=True)
     pdf.cell(100, 5, f"CNPJ: {dados['CNPJ']}", ln=True)
     if dados.get('EMAIL') is not np.nan:  
         pdf.cell(100, 5, f"E-mail: {dados['EMAIL']}", ln=True)
@@ -163,7 +162,7 @@ def gerar_pdf(dados, nome_arquivo):
     pdf.set_xy(140, 181) 
     pdf.cell(50, 5, "Extras", ln=True, align='C', border=1)
     pdf.set_xy(190, 181)
-    pdf.cell(40, 5, f"{dados['VALOR']:.2f}".replace('.', ','), ln=True, align='C', border=1)
+    pdf.cell(40, 5, f"R$ {dados['VALOR']:.2f}".replace('.', ','), ln=True, align='C', border=1)
     pdf.set_xy(230, 181) 
     pdf.cell(60, 5, "", ln=True, align='C', border=1)
     
@@ -175,7 +174,7 @@ def gerar_pdf(dados, nome_arquivo):
     pdf.set_xy(101, 188)
     pdf.cell(20, 5, "TOTAL", ln=True, align='C')
     pdf.set_xy(190, 188)
-    pdf.cell(40, 5, f"{dados['VALOR']:.2f}".replace('.', ','), ln=True, align='C')
+    pdf.cell(40, 5, f"R$ {dados['VALOR']:.2f}".replace('.', ','), ln=True, align='C')
 
     
     
