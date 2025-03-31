@@ -7,3 +7,4 @@ streamlit-option-menu ==0.4.0
 XlsxWriter==3.2.0
 temp == 2020.7.2
 openpyxl==3.1.5
+locale==0.0.2
