@@ -3,13 +3,30 @@ from tkinter import filedialog, messagebox
 from tkinter import simpledialog
 from fpdf import FPDF
 import pandas as pd
+import numpy as np
 import tempfile
 import zipfile
 import os
 import shutil
+import os
 
-# Variável global para o número da nota
-numero_nota = 1
+# Caminho do arquivo onde o número da nota será armazenado
+ARQUIVO_NUMERO_NOTA = "numero_nota.txt"
+
+# Função para ler o número da nota do arquivo (ou iniciar em 1 caso não exista)
+def carregar_numero_nota():
+    if os.path.exists(ARQUIVO_NUMERO_NOTA):
+        with open(ARQUIVO_NUMERO_NOTA, "r") as f:
+            return int(f.read().strip())  
+    return 1  
+
+# Função para salvar o número da nota no arquivo
+def salvar_numero_nota(numero):
+    with open(ARQUIVO_NUMERO_NOTA, "w") as f:
+        f.write(str(numero))
+
+# Carrega o número da nota ao iniciar
+numero_nota = carregar_numero_nota()
 
 # Função para gerar o PDF
 def gerar_pdf(dados, nome_arquivo):
@@ -40,9 +57,9 @@ def gerar_pdf(dados, nome_arquivo):
     pdf.ln(2)
     pdf.cell(100, 5, f"ENDEREÇO: {dados['ENDEREÇO']}", ln=True)
     pdf.cell(100, 5, f"CEP: {dados['CEP']}", ln=True)
-    pdf.cell(100, 5, f"BAIRRO: {dados['BAIRRO']}", ln=True)
     pdf.cell(100, 5, f"CNPJ: {dados['CNPJ']}", ln=True)
-    pdf.cell(100, 5, f"E-mail: {dados['EMAIL']}", ln=True)
+    if dados.get('EMAIL') is not np.nan:  
+        pdf.cell(100, 5, f"E-mail: {dados['EMAIL']}", ln=True)
     
     
     # Cabeçalho acima da tabela
@@ -82,6 +99,7 @@ def gerar_pdf(dados, nome_arquivo):
     
     # Incrementar o número da nota após gerar o PDF
     numero_nota += 1
+    salvar_numero_nota(numero_nota) 
     
     # Titulo parte inferior
     pdf.set_text_color(0, 0, 0)  
@@ -143,7 +161,8 @@ def gerar_pdf(dados, nome_arquivo):
     pdf.set_xy(140, 181) 
     pdf.cell(50, 5, "Extras", ln=True, align='C', border=1)
     pdf.set_xy(190, 181)
-    pdf.cell(40, 5, f"{dados['VALOR']:.2f}".replace('.', ','), ln=True, align='C', border=1)
+    valor_formatado = f"R$ {dados['VALOR']:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
+    pdf.cell(40, 5, valor_formatado, ln=True, align='C', border=1)
     pdf.set_xy(230, 181) 
     pdf.cell(60, 5, "", ln=True, align='C', border=1)
     
@@ -155,7 +174,7 @@ def gerar_pdf(dados, nome_arquivo):
     pdf.set_xy(101, 188)
     pdf.cell(20, 5, "TOTAL", ln=True, align='C')
     pdf.set_xy(190, 188)
-    pdf.cell(40, 5, f"{dados['VALOR']:.2f}".replace('.', ','), ln=True, align='C')
+    pdf.cell(40, 5, valor_formatado, ln=True, align='C')
 
     
     
@@ -192,7 +211,7 @@ def carregar_arquivo():
         if df_global.empty:
             messagebox.showerror("Erro", "O arquivo Excel está vazio. Verifique os dados.")
         else:
-            colunas_necessarias = ["LOJA", "RAZAO SOCIAL", "CNPJ", "ENDEREÇO", "CEP", "BAIRRO", "EMAIL", "VALOR", "DATA DE EMISSÃO", "DATA DE PAGAMENTO"]
+            colunas_necessarias = ["LOJA", "CNPJ", "ENDEREÇO", "CEP", "EMAIL", "VALOR", "DATA DE EMISSÃO", "DATA DE PAGAMENTO"]
             colunas_faltando = [col for col in colunas_necessarias if col not in df_global.columns]
             if colunas_faltando:
                 messagebox.showerror("Erro", f"Faltam as seguintes colunas: {', '.join(colunas_faltando)}.")
@@ -230,62 +249,105 @@ def selecionar_tipo_geracao():
 
     opcao_gerar_todos = messagebox.askyesno("Gerar Todos os PDFs", "Deseja gerar todos os PDFs de uma vez?")
     
-    if opcao_gerar_todos:  # Gerar todos os PDFs em um ZIP
+    if opcao_gerar_todos:  
         gerar_pdfs()
-    else:  # Gerar PDF de uma loja específica
+    else:  
         lojas_disponiveis = df_global['LOJA'].unique()
 
-        def loja_selecionada_callback():
-            loja_selecionada = loja_var.get()
-            if loja_selecionada:
-                loja_df = df_global[df_global['LOJA'] == loja_selecionada]
-                if loja_df.empty:
-                    messagebox.showerror("Erro", "Loja não encontrada.")
-                else:
-                    # Perguntar se deseja alterar o número da nota
-                    alterar_nota = messagebox.askyesno("Alterar Nota Fiscal", "Deseja definir um novo número de nota fiscal?")
-                    
-                    if alterar_nota:
-                        pedir_numero_nota()
-                    
-                    # Gerar o PDF individualmente
-                    pdf_path = gerar_pdf(loja_df.iloc[0], f"NOTA_DÉBITO_{loja_selecionada}")
+        def toggle_selecionar_todas():
+            """Marcar ou desmarcar todas as checkboxes."""
+            marcar = var_selecionar_todas.get()
+            for var in checkboxes.values():
+                var.set(marcar)
 
-                    # Solicitar onde salvar o PDF
+        def lojas_selecionadas_callback():
+            """Gerar PDFs com base nas lojas selecionadas."""
+            lojas_selecionadas = [loja for loja, var in checkboxes.items() if var.get()]
+
+            if not lojas_selecionadas:
+                messagebox.showerror("Erro", "Nenhuma loja foi selecionada.")
+                return
+
+            if len(lojas_selecionadas) == 1:
+                loja = lojas_selecionadas[0]
+                loja_df = df_global[df_global['LOJA'] == loja]
+                
+                if loja_df.empty:
+                    messagebox.showerror("Erro", f"Dados não encontrados para a loja {loja}.")
+                else:
+                    pdf_path = gerar_pdf(loja_df.iloc[0], f"NOTA_DÉBITO_{loja}")
                     pdf_file_name = filedialog.asksaveasfilename(defaultextension=".pdf",
                                                                   filetypes=[("PDF Files", "*.pdf")],
-                                                                  initialfile=f"NOTA DÉBITO - {loja_selecionada}.pdf")
+                                                                  initialfile=f"NOTA DÉBITO - {loja}.pdf")
                     if pdf_file_name:
                         shutil.move(pdf_path, pdf_file_name)
                         messagebox.showinfo("Sucesso", "PDF gerado com sucesso!")
+
+            else:
+                pasta_temp = "pdf_temp"
+                os.makedirs(pasta_temp, exist_ok=True)
+                
+                for loja in lojas_selecionadas:
+                    loja_df = df_global[df_global['LOJA'] == loja]
+                    if loja_df.empty:
+                        messagebox.showerror("Erro", f"Dados não encontrados para a loja {loja}.")
+                        continue
                     
-                    # Fechar a janela de seleção da loja
-                    loja_window.destroy()
+                    pdf_path = gerar_pdf(loja_df.iloc[0], f"NOTA_DÉBITO_{loja}")
+                    shutil.move(pdf_path, os.path.join(pasta_temp, f"NOTA DÉBITO - {loja}.pdf"))
 
-        # Criar a janela da lista suspensa
+                zip_file_name = filedialog.asksaveasfilename(defaultextension=".zip",
+                                                             filetypes=[("ZIP Files", "*.zip")],
+                                                             initialfile="NOTAS_DEBITO.zip")
+                if zip_file_name:
+                    with zipfile.ZipFile(zip_file_name, 'w', zipfile.ZIP_DEFLATED) as zipf:
+                        for pdf_file in os.listdir(pasta_temp):
+                            zipf.write(os.path.join(pasta_temp, pdf_file), pdf_file)
+                    
+                    shutil.rmtree(pasta_temp)
+                    messagebox.showinfo("Sucesso", "ZIP gerado com sucesso!")
+
+            loja_window.destroy()
+
+        # Criar a janela de seleção
         loja_window = tk.Toplevel(tk_root)
-        loja_window.title("Escolher Loja")
-        loja_window.geometry("350x200")
+        loja_window.title("Escolher Lojas")
+        loja_window.geometry("400x500")
         loja_window.configure(bg="#f0f0f0")
-        
-        # Criar um título
-        titulo_label = tk.Label(loja_window, text="Selecione a Loja", font=("Arial", 14, "bold"), bg="#f0f0f0")
+
+        titulo_label = tk.Label(loja_window, text="Selecione as Lojas", font=("Arial", 14, "bold"), bg="#f0f0f0")
         titulo_label.pack(pady=10)
-        
-        loja_var = tk.StringVar(loja_window)
-        loja_var.set(lojas_disponiveis[0])  # Define o valor inicial como a primeira loja
 
-        # Criar o OptionMenu com as opções de loja
-        loja_menu = tk.OptionMenu(loja_window, loja_var, *lojas_disponiveis)
-        loja_menu.config(font=("Arial", 12))
-        loja_menu.pack(pady=10)
+        checkbox_frame = tk.Frame(loja_window, bg="#f0f0f0")
+        checkbox_frame.pack(pady=10, fill="both", expand=True)
 
-        # Botão para confirmar a escolha
-        confirmar_button = tk.Button(loja_window, text="Confirmar", command=loja_selecionada_callback, 
+        canvas = tk.Canvas(checkbox_frame, bg="#f0f0f0")
+        scrollbar = tk.Scrollbar(checkbox_frame, orient="vertical", command=canvas.yview)
+        scroll_frame = tk.Frame(canvas, bg="#f0f0f0")
+
+        scroll_frame.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
+        canvas.create_window((0, 0), window=scroll_frame, anchor="nw")
+        canvas.configure(yscrollcommand=scrollbar.set)
+
+        scrollbar.pack(side="right", fill="y")
+        canvas.pack(side="left", fill="both", expand=True)
+
+        checkboxes = {}
+        for loja in lojas_disponiveis:
+            var = tk.BooleanVar()
+            checkbox = tk.Checkbutton(scroll_frame, text=loja, variable=var, font=("Arial", 12), bg="#f0f0f0")
+            checkbox.pack(anchor="w")
+            checkboxes[loja] = var
+
+        var_selecionar_todas = tk.BooleanVar()
+        selecionar_todas_btn = tk.Checkbutton(loja_window, text="Selecionar Todas", variable=var_selecionar_todas, 
+                                              font=("Arial", 12, "bold"), bg="#f0f0f0", command=toggle_selecionar_todas)
+        selecionar_todas_btn.pack(pady=5)
+
+        confirmar_button = tk.Button(loja_window, text="Confirmar", command=lojas_selecionadas_callback, 
                                      font=("Arial", 12, "bold"), bg="#4CAF50", fg="white", padx=10, pady=5)
         confirmar_button.pack(pady=10)
-        
-        # Centralizar a janela na tela
+
         loja_window.update_idletasks()
         largura_janela = loja_window.winfo_width()
         altura_janela = loja_window.winfo_height()
@@ -294,6 +356,7 @@ def selecionar_tipo_geracao():
         x = (largura_tela - largura_janela) // 2
         y = (altura_tela - altura_janela) // 2
         loja_window.geometry(f"{largura_janela}x{altura_janela}+{x}+{y}")
+
 
 
 # Configuração da interface gráfica principal
