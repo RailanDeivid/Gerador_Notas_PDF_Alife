@@ -16,7 +16,7 @@ def gerar_pdf(dados, nome_arquivo):
     global numero_nota  # Usa a variável global
     
     # Garantir que o diretório temp_pdfs exista
-    temp_pdf = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
+    os.makedirs('temp_pdfs', exist_ok=True)
     # Configuração da página
     pdf = FPDF(orientation='L', unit='mm', format='A4')  
     pdf.set_auto_page_break(auto=True, margin=15)
@@ -174,12 +174,20 @@ def gerar_pdf(dados, nome_arquivo):
 
 # ------------------------- Função para gerar um arquivo ZIP contendo todos os PDFs
 def gerar_zip_com_pdfs(df):
-    zip_name = tempfile.NamedTemporaryFile(delete=False, suffix=".zip").name
+    zip_name = tempfile.mktemp(suffix=".zip")
     with zipfile.ZipFile(zip_name, 'w') as zipf:
-        for _, row in df.iterrows():
-            pdf_path = gerar_pdf(row)
-            zipf.write(pdf_path, f"NOTA_DEBITO_{row['LOJA']}.pdf")
+        # Criar uma pasta temporária para armazenar os PDFs
+        os.makedirs('temp_pdfs', exist_ok=True)
+        
+        for index, row in df.iterrows():
+            pdf_path = gerar_pdf(row, f"NOTA_DÉBITO_{row['LOJA']}")
+            # Adicionar cada PDF ao arquivo zip com o nome desejado
+            zipf.write(pdf_path, f"NOTA DÉBITO - {row['LOJA']}.pdf")
             os.remove(pdf_path)  # Remover o arquivo PDF após adicionar ao ZIP
+        
+        # Após criar o zip, exclui a pasta temporária e seus arquivos
+        shutil.rmtree('temp_pdfs')
+    
     return zip_name
 
 # -------------------------------------------------------------------- Interface Streamlit -------------------------------------------------------------------- #
