@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 from fpdf import FPDF
+from streamlit_option_menu import option_menu
 import tempfile
 import zipfile
 import os
@@ -81,9 +82,9 @@ def gerar_pdf(dados, nome_arquivo):
     numero_nota_str = str(numero_nota).zfill(4) 
     pdf.cell(60, 10, numero_nota_str, border=1, ln=True, align='C')
     pdf.set_xy(230, 40) 
-    pdf.cell(60, 10, f"{dados['Data de emissão'].strftime('%d/%m/%Y')}", border=1, ln=True, align='C')
+    pdf.cell(60, 10, f"{dados['DATA DE EMISSÃO'].strftime('%d/%m/%Y')}", border=1, ln=True, align='C')
     pdf.set_xy(230, 50) 
-    pdf.cell(60, 10, f"{dados['Data de Pagamento'].strftime('%d/%m/%Y')}", border=1, ln=True, align='C')
+    pdf.cell(60, 10, f"{dados['DATA DE PAGAMENTO'].strftime('%d/%m/%Y')}", border=1, ln=True, align='C')
     pdf.set_xy(230, 60) 
     pdf.cell(60, 10, "Extras", border=1, ln=True, align='C')
     pdf.set_xy(230, 70) 
@@ -151,7 +152,7 @@ def gerar_pdf(dados, nome_arquivo):
     pdf.set_xy(140, 181) 
     pdf.cell(50, 5, "Extras", ln=True, align='C', border=1)
     pdf.set_xy(190, 181)
-    pdf.cell(40, 5, f"{dados['VALOR']:.2f}", ln=True, align='C', border=1)
+    pdf.cell(40, 5, f"{dados['VALOR']:.2f}".replace('.', ','), ln=True, align='C', border=1)
     pdf.set_xy(230, 181) 
     pdf.cell(60, 5, "", ln=True, align='C', border=1)
     
@@ -163,7 +164,7 @@ def gerar_pdf(dados, nome_arquivo):
     pdf.set_xy(101, 188)
     pdf.cell(20, 5, "TOTAL", ln=True, align='C')
     pdf.set_xy(200, 188)
-    pdf.cell(40, 5, f"{dados['VALOR']:.2f}", ln=True, align='C')
+    pdf.cell(40, 5, f"{dados['VALOR']:.2f}".replace('.', ','), ln=True, align='C')
 
     
     
@@ -198,20 +199,15 @@ st.markdown("""
     <style>
         .text {
             text-align: center; /* Centraliza o texto */
-            font-size: 10px;
-            color: hsl(0, 0%, 35%);
+            font-size: 40px;
+            color: #E67206FF;
             
-        }
-        .linkedin-icon {
-            width: 15px;
-            vertical-align: center;
-            margin-left: 5px;
         }
     </style>
     """, unsafe_allow_html=True)
-st.markdown("<p class='text'>💡 Desenvolvido por Railan Deivid<br>", unsafe_allow_html=True)
-st.title("Gerador de Notas de Débito em PDF")
+st.markdown("<h1 class='text'>Gerador de Notas de Débito em PDF</h1><br>", unsafe_allow_html=True)
 st.markdown("<br>", unsafe_allow_html=True)
+
 
 
 # ------------------- Upload do arquivo Excel
@@ -225,6 +221,7 @@ if arquivo:
     
     df = pd.read_excel(arquivo)
     if df.empty:
+            
             st.error("O arquivo Excel está vazio. Por favor, verifique os dados.")
     else:
         st.write("Dados carregados:")
