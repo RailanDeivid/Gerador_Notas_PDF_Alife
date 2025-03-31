@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 from fpdf import FPDF
-from streamlit_option_menu import option_menu
 import tempfile
 import zipfile
 import os
@@ -17,8 +16,8 @@ ARQUIVO_NUMERO_NOTA = "numero_nota.txt"
 def carregar_numero_nota():
     if os.path.exists(ARQUIVO_NUMERO_NOTA):
         with open(ARQUIVO_NUMERO_NOTA, "r") as f:
-            return int(f.read().strip())  # Lê e converte para inteiro
-    return 1  # Se o arquivo não existir, começa do 1
+            return int(f.read().strip())  
+    return 1  
 
 # Função para salvar o número da nota no arquivo
 def salvar_numero_nota(numero):
