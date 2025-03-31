@@ -313,17 +313,19 @@ def selecionar_tipo_geracao():
         loja_window = tk.Toplevel(tk_root)
         loja_window.title("Escolher Lojas")
         loja_window.geometry("400x500")
-        loja_window.configure(bg="#f0f0f0")
+        loja_window.configure(bg="#2C2F33")
 
-        titulo_label = tk.Label(loja_window, text="Selecione as Lojas", font=("Arial", 14, "bold"), bg="#f0f0f0")
+        # Título
+        titulo_label = tk.Label(loja_window, text="Selecione as Lojas", font=("Arial", 14, "bold"), bg="#2C2F33", fg="white")
         titulo_label.pack(pady=10)
 
-        checkbox_frame = tk.Frame(loja_window, bg="#f0f0f0")
+        # Frame para checkboxes
+        checkbox_frame = tk.Frame(loja_window, bg="#2C2F33")
         checkbox_frame.pack(pady=10, fill="both", expand=True)
 
-        canvas = tk.Canvas(checkbox_frame, bg="#f0f0f0")
+        canvas = tk.Canvas(checkbox_frame, bg="#2C2F33")
         scrollbar = tk.Scrollbar(checkbox_frame, orient="vertical", command=canvas.yview)
-        scroll_frame = tk.Frame(canvas, bg="#f0f0f0")
+        scroll_frame = tk.Frame(canvas, bg="#2C2F33")
 
         scroll_frame.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
         canvas.create_window((0, 0), window=scroll_frame, anchor="nw")
@@ -332,21 +334,27 @@ def selecionar_tipo_geracao():
         scrollbar.pack(side="right", fill="y")
         canvas.pack(side="left", fill="both", expand=True)
 
+        # Checkbuttons para lojas
         checkboxes = {}
         for loja in lojas_disponiveis:
             var = tk.BooleanVar()
-            checkbox = tk.Checkbutton(scroll_frame, text=loja, variable=var, font=("Arial", 12), bg="#f0f0f0")
+            checkbox = tk.Checkbutton(scroll_frame, text=loja, variable=var, font=("Arial", 12), bg="#2C2F33", fg="white", selectcolor="#2C2F33")
             checkbox.pack(anchor="w")
             checkboxes[loja] = var
 
+        # Selecionar todas as lojas
         var_selecionar_todas = tk.BooleanVar()
-        selecionar_todas_btn = tk.Checkbutton(loja_window, text="Selecionar Todas", variable=var_selecionar_todas, 
-                                              font=("Arial", 12, "bold"), bg="#f0f0f0", command=toggle_selecionar_todas)
+        selecionar_todas_btn = tk.Checkbutton(loja_window, text="Selecionar Todas", variable=var_selecionar_todas,
+                                            font=("Arial", 12, "bold"), bg="#2C2F33", fg="white", selectcolor="#2C2F33", command=toggle_selecionar_todas)
         selecionar_todas_btn.pack(pady=5)
 
-        confirmar_button = tk.Button(loja_window, text="Confirmar", command=lojas_selecionadas_callback, 
-                                     font=("Arial", 12, "bold"), bg="#4CAF50", fg="white", padx=10, pady=5)
+        # Botão Confirmar
+        confirmar_button = tk.Button(loja_window, text="Confirmar", command=lojas_selecionadas_callback,
+                                    font=("Arial", 12, "bold"), bg="#1E88E5", fg="white", relief="raised", bd=2, padx=10, pady=5)
         confirmar_button.pack(pady=10)
+
+    # Centralizar a janela de seleção
+
 
         loja_window.update_idletasks()
         largura_janela = loja_window.winfo_width()
@@ -360,9 +368,18 @@ def selecionar_tipo_geracao():
 
 
 # Configuração da interface gráfica principal
+# Modo escuro
+tema_fundo = "#2C2F33"
+tema_texto = "#E0E0E0"
+cor_botao = "#1E88E5"
+cor_botao_hover = "#1565C0"
 tk_root = tk.Tk()
 tk_root.title("Gerador de Notas de Débito em PDF")
 tk_root.geometry("600x400")
+# Carregar logo
+logo = tk.PhotoImage(file="logo Alife.png")  
+logo_label = tk.Label(tk_root, image=logo, bg=tema_fundo)
+logo_label.pack(pady=10)
 
 # Centralizar a janela principal
 tk_root.update_idletasks()
@@ -375,26 +392,34 @@ y = (altura_tela - altura_janela) // 2
 tk_root.geometry(f"{largura_janela}x{altura_janela}+{x}+{y}")
 
 
-# Carregar logo
-logo = tk.PhotoImage(file="logo Alife.png")  
-logo_label = tk.Label(tk_root, image=logo)
-logo_label.pack(pady=10)
 
 # Configurar a janela
-tk_root.configure(bg="#E8EBEF")  
-frame = tk.Frame(tk_root, bg="#E8EBEF")
+tk_root.configure(bg=tema_fundo)
+frame = tk.Frame(tk_root, bg=tema_fundo)
 frame.pack(padx=10, pady=10)
 
+
+
 # Título
-titulo_label = tk.Label(frame, text="Gerador de Notas de Débito", font=("Arial", 16, "bold"), bg="#E8EBEF")
+titulo_label = tk.Label(frame, text="Gerador de Notas de Débito", font=("Arial", 16, "bold"), bg=tema_fundo, fg=tema_texto)
 titulo_label.pack(pady=10)
 
-# Botões da interface com estilo
-botao_carregar = tk.Button(frame, text="Carregar Arquivo Excel", command=carregar_arquivo, font=("Arial", 12), bg="#4CAF50", fg="white", relief="raised", bd=2, padx=10, pady=5)
-botao_carregar.pack(pady=10)
+# Botões estilizados
+def on_enter(e):
+    e.widget.config(bg=cor_botao_hover)
 
-botao_gerar_pdfs = tk.Button(frame, text="Gerar PDFs", command=selecionar_tipo_geracao, font=("Arial", 12), bg="#008CBA", fg="white", relief="raised", bd=2, padx=10, pady=5)
+def on_leave(e):
+    e.widget.config(bg=cor_botao)
+
+botao_carregar = tk.Button(frame, text="Carregar Arquivo Excel", command=carregar_arquivo, font=("Arial", 12), bg=cor_botao, fg="white", relief="raised", bd=2, padx=10, pady=5)
+botao_carregar.pack(pady=10)
+botao_carregar.bind("<Enter>", on_enter)
+botao_carregar.bind("<Leave>", on_leave)
+
+botao_gerar_pdfs = tk.Button(frame, text="Gerar PDFs", command=selecionar_tipo_geracao, font=("Arial", 12), bg=cor_botao, fg="white", relief="raised", bd=2, padx=10, pady=5)
 botao_gerar_pdfs.pack(pady=10)
+botao_gerar_pdfs.bind("<Enter>", on_enter)
+botao_gerar_pdfs.bind("<Leave>", on_leave)
 
 # Executar a interface gráfica
 tk_root.mainloop()

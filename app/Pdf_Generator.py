@@ -6,9 +6,13 @@ import tempfile
 import zipfile
 import os
 import shutil 
-
-
 import os
+from PIL import Image
+import base64
+from io import BytesIO
+
+# Carregar a imagem do logo
+logo = Image.open("Logo Alife.png")
 
 # Caminho do arquivo onde o número da nota será armazenado
 ARQUIVO_NUMERO_NOTA = "numero_nota.txt"
@@ -205,8 +209,36 @@ def gerar_zip_com_pdfs(df):
 
 # -------------------------------------------------------------------- Interface Streamlit -------------------------------------------------------------------- #
 # ----------------------- Configuração da página
+
+
+
+
 st.set_page_config(page_title="Gerador de Notas de Débito em PDF",
                    page_icon="📄", layout="wide", initial_sidebar_state="expanded")
+
+
+def logo_to_base64(logo):
+    buffered = BytesIO()
+    logo.save(buffered, format="PNG")
+    return base64.b64encode(buffered.getvalue()).decode("utf-8")
+
+# # Adicionar o logo centralizado na parte superior da página
+# st.markdown("""
+#     <style>
+#         .logo {
+#             position: fixed;
+#             top: 35%;
+#             left: 50%;
+#             transform: translate(-50%, -50%);
+#             width: 120px;  # Ajuste o tamanho conforme necessário
+#         }
+#     </style>
+# """, unsafe_allow_html=True)
+
+# # Exibindo o logo centralizado no topo
+# st.markdown('<img class="logo" src="data:image/png;base64,{}" />'.format(logo_to_base64(logo)), unsafe_allow_html=True)
+
+
 # Setar título
 st.markdown("""
     <style>
