@@ -236,7 +236,7 @@ if arquivo:
         st.error("O arquivo Excel está vazio. Por favor, verifique os dados.")
     else:
         # Define as colunas necessárias
-        colunas_necessarias = ["LOJA", "RAZAO SOCIAL", "CNPJ", "ENDEREÇO", "CEP", "BAIRRO", "EMAIL", "VALOR", "DATA DE EMISSÃO", "DATA DE PAGAMENTO"] 
+        colunas_necessarias = ["LOJA", "CNPJ", "ENDEREÇO", "CEP", "EMAIL", "VALOR", "DATA DE EMISSÃO", "DATA DE PAGAMENTO"] 
 
         # Verifica se todas as colunas necessárias estão presentes no DataFrame
         colunas_faltando = [col for col in colunas_necessarias if col not in df.columns]
