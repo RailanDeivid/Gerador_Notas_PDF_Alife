@@ -8,8 +8,27 @@ import os
 import shutil 
 
 
-# Variável global para o número da nota
-numero_nota = 1
+import os
+
+# Caminho do arquivo onde o número da nota será armazenado
+ARQUIVO_NUMERO_NOTA = "numero_nota.txt"
+
+# Função para ler o número da nota do arquivo (ou iniciar em 1 caso não exista)
+def carregar_numero_nota():
+    if os.path.exists(ARQUIVO_NUMERO_NOTA):
+        with open(ARQUIVO_NUMERO_NOTA, "r") as f:
+            return int(f.read().strip())  # Lê e converte para inteiro
+    return 1  # Se o arquivo não existir, começa do 1
+
+# Função para salvar o número da nota no arquivo
+def salvar_numero_nota(numero):
+    with open(ARQUIVO_NUMERO_NOTA, "w") as f:
+        f.write(str(numero))
+
+# Carrega o número da nota ao iniciar
+numero_nota = carregar_numero_nota()
+
+
 
 # Função para gerar o PDF
 def gerar_pdf(dados, nome_arquivo):
@@ -66,7 +85,7 @@ def gerar_pdf(dados, nome_arquivo):
     # Valores da tabela
     pdf.set_font("Arial", "", 11)
     pdf.set_xy(230, 30) 
-    numero_nota_str = str(numero_nota).zfill(4) 
+    numero_nota_str = str(numero_nota).zfill(5) 
     pdf.cell(60, 10, numero_nota_str, border=1, ln=True, align='C')
     pdf.set_xy(230, 40) 
     pdf.cell(60, 10, f"{dados['DATA DE EMISSÃO'].strftime('%d/%m/%Y')}", border=1, ln=True, align='C')
@@ -80,6 +99,7 @@ def gerar_pdf(dados, nome_arquivo):
     
     # Incrementar o número da nota após gerar o PDF
     numero_nota += 1
+    salvar_numero_nota(numero_nota) 
     
     # Titulo parte inferior
     pdf.set_text_color(0, 0, 0)  
@@ -234,16 +254,16 @@ if arquivo:
                     loja_selecionada = st.selectbox("Selecione a loja para gerar o PDF", df['LOJA'].tolist())
                     # selecao = st.multiselect("Selecione as lojas para gerar PDF", df['LOJA'].tolist())
 
-                # Perguntar se deseja inserir manualmente o número da nota
-                numero_manual = st.radio("Deseja inserir manualmente o número da nota?", ("Não", "Sim"))
+                # # Perguntar se deseja inserir manualmente o número da nota
+                # numero_manual = st.radio("Deseja inserir manualmente o número da nota?", ("Não", "Sim"))
 
-                if numero_manual == "Sim":
-                    # Se escolher "Sim", permitir que o usuário insira o número manualmente
-                    cols = st.columns(3)
-                    with cols[0]:
-                        numero_nota_input = st.text_input("Insira o número da nota (0000):", value=str(numero_nota), max_chars=4)
-                    if numero_nota_input:
-                        numero_nota = int(numero_nota_input)   # Atualiza a variável global com o número manual inserido
+                # if numero_manual == "Sim":
+                #     # Se escolher "Sim", permitir que o usuário insira o número manualmente
+                #     cols = st.columns(3)
+                #     with cols[0]:
+                #         numero_nota_input = st.text_input("Insira o número da nota (0000):", value=str(numero_nota), max_chars=4)
+                #     if numero_nota_input:
+                #         numero_nota = int(numero_nota_input)   # Atualiza a variável global com o número manual inserido
 
     # Agora, exibe o botão "Gerar PDF" após o número ser inserido ou caso não queira inserir
     if st.button("Gerar PDF"):
