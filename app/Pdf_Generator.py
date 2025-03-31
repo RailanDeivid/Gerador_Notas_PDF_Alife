@@ -7,7 +7,7 @@ import os
 import shutil 
 import locale
 # Define o locale para formato brasileiro
-locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
+locale.setlocale(locale.LC_ALL, 'C')
 
 # Variável global para o número da nota
 numero_nota = 1
