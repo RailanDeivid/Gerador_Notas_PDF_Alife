@@ -33,7 +33,7 @@ def gerar_pdf(dados, nome_arquivo):
     
 
     
-    # Dados casa pagantet e
+    # Dados casa pagante
     pdf.set_font("Arial", "", 10)
     pdf.set_xy(10, 30) 
     pdf.cell(100, 5, f"{dados['LOJA']}", ln=True)
@@ -44,17 +44,6 @@ def gerar_pdf(dados, nome_arquivo):
     pdf.cell(100, 5, f"CNPJ: {dados['CNPJ']}", ln=True)
     pdf.cell(100, 5, f"E-mail: {dados['EMAIL']}", ln=True)
     
-    # Dados Destinatário 
-    pdf.set_xy(118, 45) 
-    pdf.cell(200, 10, f"CNPJ: 11513881000160", ln=True)
-    pdf.set_xy(118, 50)
-    pdf.cell(200, 10, f"Rua AUGUSTA, 3000", ln=True)
-    pdf.set_xy(118, 55)
-    pdf.cell(200, 10, f"CERQUEIRA CESAR - São Paulo / SP", ln=True)
-    pdf.set_xy(118, 60)
-    pdf.cell(200, 10, f"CEP: 01.412-100", ln=True)
-    pdf.set_xy(118, 65)
-    pdf.cell(200, 10, f"E-mail: laiane.costa@alifegroup.com.br", ln=True)
     
     # Cabeçalho acima da tabela
     pdf.set_xy(230, 25)   
