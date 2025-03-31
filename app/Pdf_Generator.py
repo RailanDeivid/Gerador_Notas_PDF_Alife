@@ -163,7 +163,7 @@ def gerar_pdf(dados, nome_arquivo):
     pdf.cell(280, 8, "", ln=True, align='C', border=1, fill=True)
     pdf.set_xy(101, 188)
     pdf.cell(20, 5, "TOTAL", ln=True, align='C')
-    pdf.set_xy(200, 188)
+    pdf.set_xy(190, 188)
     pdf.cell(40, 5, f"{dados['VALOR']:.2f}".replace('.', ','), ln=True, align='C')
 
     
@@ -201,7 +201,7 @@ st.markdown("""
         .rounded-title {
             text-align: center; 
             font-size: 40px;
-            color: #EF722A;
+            
         }
     </style>
     """, unsafe_allow_html=True)
