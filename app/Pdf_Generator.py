@@ -222,35 +222,43 @@ with cols[0]:
 
 # ------------------- Verifica se o arquivo foi enviado
 if arquivo:
-    
     df = pd.read_excel(arquivo)
-    if df.empty:
-            
-            st.error("O arquivo Excel está vazio. Por favor, verifique os dados.")
+
+    # Verifica se o DataFrame está vazio
+    if df.empty: 
+        st.error("O arquivo Excel está vazio. Por favor, verifique os dados.")
     else:
-        st.write("Dados carregados:")
-        st.dataframe(df)    
-        
-        # Escolher se quer gerar todos ou selecionar manualmente
-        opcao = st.radio("Escolha uma opção:", ("Gerar todos os PDFs", "Escolher quais gerar"),horizontal=True)
-        
-        if opcao == "Escolher quais gerar":
-            # Checkbox para selecionar os PDFs individuais
-            cols = st.columns(3)
-            with cols[0]:
-                loja_selecionada = st.selectbox("Selecione a loja para gerar o PDF", df['LOJA'].tolist())
-                # selecao = st.multiselect("Selecione as lojas para gerar PDF", df['LOJA'].tolist())
+        # Define as colunas necessárias
+        colunas_necessarias = ["LOJA", "RAZAO SOCIAL", "CNPJ", "ENDEREÇO", "CEP", "BAIRRO", "EMAIL", "VALOR", "DATA DE EMISSÃO", "DATA DE PAGAMENTO"] 
 
-            # Perguntar se deseja inserir manualmente o número da nota
-            numero_manual = st.radio("Deseja inserir manualmente o número da nota?", ("Não", "Sim"))
+        # Verifica se todas as colunas necessárias estão presentes no DataFrame
+        colunas_faltando = [col for col in colunas_necessarias if col not in df.columns]
+        if colunas_faltando:
+            st.error(f"Faltam as seguintes colunas: {', '.join(colunas_faltando)}. Por favor, verifique o arquivo e tente novamente.")
+        else:
+            st.write("Dados carregados:")
+            st.dataframe(df)    
 
-            if numero_manual == "Sim":
-                # Se escolher "Sim", permitir que o usuário insira o número manualmente
+            # Escolher se quer gerar todos ou selecionar manualmente
+            opcao = st.radio("Escolha uma opção:", ("Gerar todos os PDFs", "Escolher quais gerar"), horizontal=True)
+
+            if opcao == "Escolher quais gerar":
+                # Checkbox para selecionar os PDFs individuais
                 cols = st.columns(3)
                 with cols[0]:
-                    numero_nota_input = st.text_input("Insira o número da nota (0000):", value=str(numero_nota), max_chars=4)
-                if numero_nota_input:
-                    numero_nota = int(numero_nota_input)  # Atualiza a variável global com o número manual inserido
+                    loja_selecionada = st.selectbox("Selecione a loja para gerar o PDF", df['LOJA'].tolist())
+                    # selecao = st.multiselect("Selecione as lojas para gerar PDF", df['LOJA'].tolist())
+
+                # Perguntar se deseja inserir manualmente o número da nota
+                numero_manual = st.radio("Deseja inserir manualmente o número da nota?", ("Não", "Sim"))
+
+                if numero_manual == "Sim":
+                    # Se escolher "Sim", permitir que o usuário insira o número manualmente
+                    cols = st.columns(3)
+                    with cols[0]:
+                        numero_nota_input = st.text_input("Insira o número da nota (0000):", value=str(numero_nota), max_chars=4)
+                    if numero_nota_input:
+                        numero_nota = int(numero_nota_input)   # Atualiza a variável global com o número manual inserido
 
     # Agora, exibe o botão "Gerar PDF" após o número ser inserido ou caso não queira inserir
     if st.button("Gerar PDF"):
