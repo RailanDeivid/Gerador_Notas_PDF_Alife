@@ -57,9 +57,12 @@ def gerar_pdf(dados, nome_arquivo):
     pdf.ln(2)
     pdf.cell(100, 5, f"ENDEREÇO: {dados['ENDEREÇO']}", ln=True)
     pdf.cell(100, 5, f"CEP: {dados['CEP']}", ln=True)
-    pdf.cell(100, 5, f"BAIRRO: {dados['BAIRRO']}", ln=True)
+    # pdf.cell(100, 5, f"BAIRRO: {dados['BAIRRO']}", ln=True)
     pdf.cell(100, 5, f"CNPJ: {dados['CNPJ']}", ln=True)
-    pdf.cell(100, 5, f"E-mail: {dados['EMAIL']}", ln=True)
+    if dados['EMAIL'] is None:
+        pdf.cell(100, 5, f"", ln=True)
+    else:
+        pdf.cell(100, 5, f"E-mail: {dados['EMAIL']}", ln=True)
     
     # Cabeçalho acima da tabela
     pdf.set_xy(230, 25)   
