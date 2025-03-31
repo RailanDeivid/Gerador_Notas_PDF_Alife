@@ -1,0 +1,4 @@
+streamlit==1.44.0
+pandas==2.2.3
+fpdf==1.7.2
+locale==0.0.2
