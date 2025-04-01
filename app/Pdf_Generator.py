@@ -303,6 +303,7 @@ if arquivo:
                         for loja in selecao:
                             row = df[df['LOJA'] == loja].iloc[0]
                             pdf_path = gerar_pdf(row, f"NOTA_DÉBITO_{row['LOJA']}")
+                            file_name=f"NOTA_DÉBITO_{loja}.pdf",
                             zipf.write(pdf_path, os.path.basename(pdf_path))  
                     
                     with open(zip_path, "rb") as f:
