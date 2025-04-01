@@ -207,10 +207,12 @@ def gerar_zip_com_pdfs(df):
 
 # Caminho para a imagem na pasta
 logo_path = Path("logo page.png")
-
+# Carregar imagem e converter para bytes
+with open(logo_path, "rb") as img_file:
+    logo_bytes = img_file.read()
     
 st.set_page_config(page_title="Gerador de Notas de Débito em PDF",
-                   page_icon=logo_path, layout="wide", initial_sidebar_state="expanded")
+                   page_icon=logo_bytes, layout="wide", initial_sidebar_state="expanded")
 
 
 # Setar título
