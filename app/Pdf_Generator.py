@@ -281,16 +281,40 @@ if arquivo:
                         mime="application/zip"
                     )
             elif opcao == "Escolher quais gerar":
-                for loja in selecao:
+                if len(selecao) == 1:
+                    # Se apenas uma loja for selecionada, gera um único PDF
+                    loja = selecao[0]
                     row = df[df['LOJA'] == loja].iloc[0]
                     pdf_path = gerar_pdf(row, f"NOTA_DÉBITO_{row['LOJA']}")
+
                     with open(pdf_path, "rb") as f:
                         st.download_button(
                             label=f"Baixar Nota de Débito - {loja}",
                             data=f,
-                            file_name=f"NOTA DÉBITO - {loja}.pdf",  
+                            file_name=f"NOTA_DÉBITO_{loja}.pdf",
                             mime="application/pdf"
                         )
+                
+                elif len(selecao) > 1:
+                    # Se mais de uma loja for selecionada, gera múltiplos PDFs e compacta em um ZIP
+                    zip_path = gerar_zip_com_pdfs(df)
+
+                    with zipfile.ZipFile(zip_path, "w") as zipf:
+                        for loja in selecao:
+                            row = df[df['LOJA'] == loja].iloc[0]
+                            pdf_path = gerar_pdf(row, f"NOTA_DÉBITO_{row['LOJA']}")
+                            zipf.write(pdf_path, os.path.basename(pdf_path))  
+                    
+                    with open(zip_path, "rb") as f:
+                        st.download_button(
+                            label="Baixar todas as Notas de Débito",
+                            data=f,
+                            file_name="Notas_Debito.zip",
+                            mime="application/zip"
+                        )
+
+                    # Remove o arquivo ZIP após o download
+                    os.remove(zip_path)
             # elif opcao == "Escolher quais gerar":
             #     # Selecionar a linha da loja escolhida
             #     row = df[df['LOJA'] == loja_selecionada].iloc[0]
