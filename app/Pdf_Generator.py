@@ -206,7 +206,7 @@ def gerar_zip_com_pdfs(df):
 
 
 # Caminho para a imagem na pasta
-logo_path = Path("logo page.png")
+logo_path = Path(__file__).parent / "logo page.png"
 # Carregar imagem e converter para bytes
 with open(logo_path, "rb") as img_file:
     logo_bytes = img_file.read()
