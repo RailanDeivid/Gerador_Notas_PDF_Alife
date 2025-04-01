@@ -302,10 +302,11 @@ if arquivo:
                     with zipfile.ZipFile(zip_path, "w") as zipf:
                         for loja in selecao:
                             row = df[df['LOJA'] == loja].iloc[0]
-                            pdf_path = gerar_pdf(row, f"NOTA_DÉBITO_{row['LOJA']}")
-                            file_name=f"NOTA_DÉBITO_{loja}.pdf",
-                            zipf.write(pdf_path, os.path.basename(pdf_path))  
-                    
+                            pdf_filename = f"NOTA_DÉBITO_{loja}.pdf"  # Nome do PDF no ZIP
+                            pdf_path = gerar_pdf(row, pdf_filename)  # Gera o PDF com o nome correto
+                            
+                            zipf.write(pdf_path, pdf_filename)  # Adiciona ao ZIP com o nome correto
+                        
                     with open(zip_path, "rb") as f:
                         st.download_button(
                             label="Baixar todas as Notas de Débito",
