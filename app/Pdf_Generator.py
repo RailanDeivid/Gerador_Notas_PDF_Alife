@@ -7,7 +7,7 @@ import zipfile
 import os
 import shutil 
 import os
-
+from pathlib import Path
 # Caminho do arquivo onde o número da nota será armazenado
 ARQUIVO_NUMERO_NOTA = "numero_nota.txt"
 
@@ -203,8 +203,14 @@ def gerar_zip_com_pdfs(df):
 
 # -------------------------------------------------------------------- Interface Streamlit -------------------------------------------------------------------- #
 # ----------------------- Configuração da página
+
+
+# Caminho para a imagem na pasta
+logo_path = Path("logo page.png")
+
+    
 st.set_page_config(page_title="Gerador de Notas de Débito em PDF",
-                   page_icon="📄", layout="wide", initial_sidebar_state="expanded")
+                   page_icon=logo_path, layout="wide", initial_sidebar_state="expanded")
 
 
 # Setar título
