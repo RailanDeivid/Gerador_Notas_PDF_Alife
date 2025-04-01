@@ -297,15 +297,21 @@ if arquivo:
                 
                 elif len(selecao) > 1:
                     # Se mais de uma loja for selecionada, gera múltiplos PDFs e compacta em um ZIP
-                    zip_path = gerar_zip_com_pdfs(df)
+                    zip_path = "Notas_Debito.zip"
 
+                    with zipfile.ZipFile(zip_path, "w") as zipf:
+                        for loja in selecao:
+                            row = df[df['LOJA'] == loja].iloc[0]
+                            pdf_path = gerar_pdf(row, f"NOTA_DÉBITO_{row['LOJA']}")
+                            zipf.write(pdf_path, os.path.basename(pdf_path))  
+                    
                     with open(zip_path, "rb") as f:
                         st.download_button(
-                            label="Baixar Todos os PDFs",
+                            label="Baixar todas as Notas de Débito",
                             data=f,
-                            file_name="notas_de_debito.zip",
+                            file_name="Notas_Debito.zip",
                             mime="application/zip"
-                        ) 
+                        )
 
                     # Remove o arquivo ZIP após o download
                     os.remove(zip_path)
