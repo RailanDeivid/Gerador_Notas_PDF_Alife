@@ -226,35 +226,35 @@ st.markdown("<br>", unsafe_allow_html=True)
 arquivo = st.file_uploader("Envie o arquivo Excel", type=["xlsx"])
 
 
-
-# ------------------- Verifica se o arquivo foi enviado
-if arquivo:
+# Lista de colunas obrigatórias
+colunas_necessarias = ["LOJA", "CNPJ", "ENDEREÇO", "CEP", "EMAIL", "VALOR", "DATA DE EMISSÃO", "DATA DE PAGAMENTO"] 
+colunas_necessarias_com_dados = ["LOJA", "CNPJ", "ENDEREÇO", "CEP", "VALOR", "DATA DE EMISSÃO", "DATA DE PAGAMENTO"] 
+if 'arquivo' in locals() or 'arquivo' in globals():  # Verifica se o arquivo foi carregado
     df = pd.read_excel(arquivo)
 
     # Verifica se o DataFrame está vazio
     if df.empty: 
-        st.error("O arquivo Excel está vazio. Por favor, verifique os dados.")
+        st.error("O arquivo Excel está vazio. Por favor, verifique os dados e tente novamente.")
     else:
-        # Define as colunas necessárias
-        colunas_necessarias = ["LOJA", "CNPJ", "ENDEREÇO", "CEP", "EMAIL", "VALOR", "DATA DE EMISSÃO", "DATA DE PAGAMENTO"] 
-
-        # Verifica se todas as colunas necessárias estão presentes no DataFrame
+        # Verifica se todas as colunas necessárias estão presentes
         colunas_faltando = [col for col in colunas_necessarias if col not in df.columns]
         if colunas_faltando:
             st.error(f"Faltam as seguintes colunas: {', '.join(colunas_faltando)}. Por favor, verifique o arquivo e tente novamente.")
         else:
-            st.write("Dados carregados:")
-            st.dataframe(df)    
+            # Verifica se há valores nulos nas colunas obrigatórias
+            colunas_com_nulos = [col for col in colunas_necessarias_com_dados if df[col].isna().sum() > 0]
+            if colunas_com_nulos:
+                st.error(f"As seguintes colunas possuem valores ausentes: {', '.join(colunas_com_nulos)}. Por favor, corrija os dados e reenvie o arquivo.")
+            else:
+                st.success("Dados carregados com sucesso!")
+                st.dataframe(df)
 
-            # Escolher se quer gerar todos ou selecionar manualmente
-            opcao = st.radio("Escolha uma opção:", ("Gerar todos os PDFs", "Escolher quais gerar"), horizontal=True)
+                # Escolher se quer gerar todos ou selecionar manualmente
+                opcao = st.radio("Escolha uma opção:", ("Gerar todos os PDFs", "Escolher quais gerar"), horizontal=True)
 
-            if opcao == "Escolher quais gerar":
-                # Checkbox para selecionar os PDFs individuais
-                cols = st.columns(3)
-                with cols[0]:
-                    # loja_selecionada = st.selectbox("Selecione a loja para gerar o PDF", df['LOJA'].tolist())
+                if opcao == "Escolher quais gerar":
                     selecao = st.multiselect("Selecione as lojas para gerar PDF", df['LOJA'].tolist())
+
 
                 # # Perguntar se deseja inserir manualmente o número da nota
                 # numero_manual = st.radio("Deseja inserir manualmente o número da nota?", ("Não", "Sim"))
