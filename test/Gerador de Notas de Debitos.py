@@ -7,11 +7,12 @@ import numpy as np
 import tempfile
 import zipfile
 import os
+from PIL import Image, ImageTk
 import shutil
 import os
 
 # Caminho do arquivo onde o número da nota será armazenado
-ARQUIVO_NUMERO_NOTA = "numero_nota.txt"
+ARQUIVO_NUMERO_NOTA = "NFNumber.txt"
 
 # Função para ler o número da nota do arquivo (ou iniciar em 1 caso não exista)
 def carregar_numero_nota():
@@ -27,6 +28,12 @@ def salvar_numero_nota(numero):
 
 # Carrega o número da nota ao iniciar
 numero_nota = carregar_numero_nota()
+
+# Modo escuro
+tema_fundo = "#2C2F33"
+tema_texto = "#E0E0E0"
+cor_botao = "#1E88E5"
+cor_botao_hover = "#1565C0"
 
 # Função para gerar o PDF
 def gerar_pdf(dados, nome_arquivo):
@@ -47,7 +54,6 @@ def gerar_pdf(dados, nome_arquivo):
     pdf.set_fill_color(132, 183, 83)  
     pdf.cell(280, 10, "NOTA DE DÉBITO", ln=True, align='C', border=1, fill=True)
     pdf.ln(20)
-    
 
     
     # Dados casa pagante
@@ -60,7 +66,8 @@ def gerar_pdf(dados, nome_arquivo):
     pdf.cell(100, 5, f"CNPJ: {dados['CNPJ']}", ln=True)
     if dados.get('EMAIL') is not np.nan:  
         pdf.cell(100, 5, f"E-mail: {dados['EMAIL']}", ln=True)
-    
+
+
     
     # Cabeçalho acima da tabela
     pdf.set_xy(230, 25)   
@@ -85,7 +92,7 @@ def gerar_pdf(dados, nome_arquivo):
     # Valores da tabela
     pdf.set_font("Arial", "", 11)
     pdf.set_xy(230, 30) 
-    numero_nota_str = str(numero_nota).zfill(4) 
+    numero_nota_str = str(numero_nota).zfill(5) 
     pdf.cell(60, 10, numero_nota_str, border=1, ln=True, align='C')
     pdf.set_xy(230, 40) 
     pdf.cell(60, 10, f"{dados['DATA DE EMISSÃO'].strftime('%d/%m/%Y')}", border=1, ln=True, align='C')
@@ -134,7 +141,6 @@ def gerar_pdf(dados, nome_arquivo):
     pdf.set_fill_color(218, 255, 183) 
     
     # Cabeçalhos da tabela Inferior
-    
     pdf.cell(30, 5, "Item", ln=True, align='C', border=1, fill=True)
     pdf.set_xy(40, 176) 
     pdf.cell(40, 5, "Descrição", ln=True, align='C', border=1, fill=True)
@@ -174,6 +180,7 @@ def gerar_pdf(dados, nome_arquivo):
     pdf.set_xy(101, 188)
     pdf.cell(20, 5, "TOTAL", ln=True, align='C')
     pdf.set_xy(190, 188)
+    # pdf.cell(40, 5, f"R$ {dados['VALOR']:.2f}".replace('.', ','), ln=True, align='C')
     pdf.cell(40, 5, valor_formatado, ln=True, align='C')
 
     
@@ -183,22 +190,24 @@ def gerar_pdf(dados, nome_arquivo):
     pdf.output(temp_pdf.name)
     return temp_pdf.name
 
+# ------------------------- Função para gerar um arquivo ZIP contendo todos os PDFs
 def gerar_zip_com_pdfs(df):
     zip_name = tempfile.mktemp(suffix=".zip")
     with zipfile.ZipFile(zip_name, 'w') as zipf:
+        # Criar uma pasta temporária para armazenar os PDFs
         os.makedirs('temp_pdfs', exist_ok=True)
-
+        
         for index, row in df.iterrows():
             pdf_path = gerar_pdf(row, f"NOTA_DÉBITO_{row['LOJA']}")
+            # Adicionar cada PDF ao arquivo zip com o nome desejado
             zipf.write(pdf_path, f"NOTA DÉBITO - {row['LOJA']}.pdf")
-            os.remove(pdf_path)
-
+            os.remove(pdf_path)  # Remover o arquivo PDF após adicionar ao ZIP
+        
+        # Após criar o zip, exclui a pasta temporária e seus arquivos
         shutil.rmtree('temp_pdfs')
-
+    
     return zip_name
 
-
-    
     
 # Função para carregar o arquivo Excel
 def carregar_arquivo():
@@ -324,7 +333,7 @@ def selecionar_tipo_geracao():
         checkbox_frame.pack(pady=10, fill="both", expand=True)
 
         canvas = tk.Canvas(checkbox_frame, bg="#2C2F33")
-        scrollbar = tk.Scrollbar(checkbox_frame, orient="vertical", command=canvas.yview)
+        scrollbar = tk.Scrollbar(checkbox_frame, orient="vertical", command=canvas.yview, bg="#2C2F33")
         scroll_frame = tk.Frame(canvas, bg="#2C2F33")
 
         scroll_frame.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
@@ -368,18 +377,16 @@ def selecionar_tipo_geracao():
 
 
 # Configuração da interface gráfica principal
-# Modo escuro
-tema_fundo = "#2C2F33"
-tema_texto = "#E0E0E0"
-cor_botao = "#1E88E5"
-cor_botao_hover = "#1565C0"
+
+
+
 tk_root = tk.Tk()
 tk_root.title("Gerador de Notas de Débito em PDF")
 tk_root.geometry("600x400")
-# Carregar logo
-logo = tk.PhotoImage(file="logo Alife.png")  
-logo_label = tk.Label(tk_root, image=logo, bg=tema_fundo)
-logo_label.pack(pady=10)
+# # Carregar logo
+# logo = tk.PhotoImage(file="logo Alife.png")  
+# logo_label = tk.Label(tk_root, image=logo, bg=tema_fundo)
+# logo_label.pack(pady=10)
 
 # Centralizar a janela principal
 tk_root.update_idletasks()

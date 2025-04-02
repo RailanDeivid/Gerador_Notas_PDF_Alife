@@ -1,0 +1,52 @@
+/* Estilo geral */
+QWidget {
+    background-color: #121212;
+    color: #E0E0E0;
+    font-size: 14px;
+}
+
+/* Botões */
+QPushButton {
+    background-color: #FF8C00;
+    color: black;
+    border-radius: 5px;
+    padding: 8px;
+}
+
+QPushButton:hover {
+    background-color: #FFA500;
+}
+
+QPushButton:pressed {
+    background-color: #FF7F00;
+}
+
+/* Caixa de texto */
+QLineEdit {
+    background-color: #1E1E1E;
+    color: white;
+    border: 1px solid #FF8C00;
+    border-radius: 3px;
+    padding: 5px;
+}
+
+/* Combobox */
+QComboBox {
+    background-color: #1E1E1E;
+    color: white;
+    border: 1px solid #FF8C00;
+    padding: 5px;
+}
+
+/* Mensagens */
+QMessageBox {
+    background-color: #121212;
+    color: white;
+}
+
+/* Listas */
+QListWidget {
+    background-color: #1E1E1E;
+    color: white;
+    border: 1px solid #FF8C00;
+}
