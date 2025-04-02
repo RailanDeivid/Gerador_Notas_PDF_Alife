@@ -7,10 +7,12 @@ import numpy as np
 import tempfile
 import zipfile
 import os
-from PIL import Image, ImageTk
+
 import shutil
 import os
+from datetime import datetime, timedelta
 
+mes_ano =  (datetime.now().replace(day=1) - timedelta(days=1)).strftime("%m%Y")
 # Caminho do arquivo onde o número da nota será armazenado
 ARQUIVO_NUMERO_NOTA = "NFNumber.txt"
 
@@ -198,9 +200,9 @@ def gerar_zip_com_pdfs(df):
         os.makedirs('temp_pdfs', exist_ok=True)
         
         for index, row in df.iterrows():
-            pdf_path = gerar_pdf(row, f"NOTA_DÉBITO_{row['LOJA']}")
+            pdf_path = gerar_pdf(row, f"NOTA_DÉBITO_{row['LOJA']} {numero_nota-1}_{mes_ano}")
             # Adicionar cada PDF ao arquivo zip com o nome desejado
-            zipf.write(pdf_path, f"NOTA DÉBITO - {row['LOJA']}.pdf")
+            zipf.write(pdf_path, f"NOTA DÉBITO - {row['LOJA']} {numero_nota-1}_{mes_ano}.pdf")
             os.remove(pdf_path)  # Remover o arquivo PDF após adicionar ao ZIP
         
         # Após criar o zip, exclui a pasta temporária e seus arquivos
@@ -287,7 +289,7 @@ def selecionar_tipo_geracao():
                     pdf_path = gerar_pdf(loja_df.iloc[0], f"NOTA_DÉBITO_{loja}")
                     pdf_file_name = filedialog.asksaveasfilename(defaultextension=".pdf",
                                                                   filetypes=[("PDF Files", "*.pdf")],
-                                                                  initialfile=f"NOTA DÉBITO - {loja}.pdf")
+                                                                  initialfile=f"NOTA DÉBITO - {loja} {numero_nota-1}_{mes_ano}.pdf")
                     if pdf_file_name:
                         shutil.move(pdf_path, pdf_file_name)
                         messagebox.showinfo("Sucesso", "PDF gerado com sucesso!")
@@ -303,11 +305,11 @@ def selecionar_tipo_geracao():
                         continue
                     
                     pdf_path = gerar_pdf(loja_df.iloc[0], f"NOTA_DÉBITO_{loja}")
-                    shutil.move(pdf_path, os.path.join(pasta_temp, f"NOTA DÉBITO - {loja}.pdf"))
+                    shutil.move(pdf_path, os.path.join(pasta_temp, f"NOTA DÉBITO - {loja} {numero_nota-1}_{mes_ano}.pdf"))
 
                 zip_file_name = filedialog.asksaveasfilename(defaultextension=".zip",
                                                              filetypes=[("ZIP Files", "*.zip")],
-                                                             initialfile="NOTAS_DEBITO.zip")
+                                                             initialfile=f"NOTAS_DEBITO_{mes_ano}.zip")
                 if zip_file_name:
                     with zipfile.ZipFile(zip_file_name, 'w', zipfile.ZIP_DEFLATED) as zipf:
                         for pdf_file in os.listdir(pasta_temp):
@@ -382,7 +384,7 @@ def selecionar_tipo_geracao():
 
 tk_root = tk.Tk()
 tk_root.title("Gerador de Notas de Débito em PDF")
-tk_root.geometry("600x400")
+tk_root.geometry("400x200")
 # # Carregar logo
 # logo = tk.PhotoImage(file="logo Alife.png")  
 # logo_label = tk.Label(tk_root, image=logo, bg=tema_fundo)
