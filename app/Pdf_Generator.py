@@ -23,7 +23,8 @@ def salvar_numero_nota(numero):
     with open(ARQUIVO_NUMERO_NOTA, "w") as f:
         f.write(str(numero))
 
-
+# Carrega o número da nota ao iniciar
+numero_nota = carregar_numero_nota()
 
 
 
