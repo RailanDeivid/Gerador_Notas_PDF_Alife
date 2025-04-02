@@ -188,6 +188,7 @@ def gerar_pdf(dados, nome_arquivo):
 
 # ------------------------- Função para gerar um arquivo ZIP contendo todos os PDFs
 def gerar_zip_com_pdfs(df):
+    global numero_nota
     zip_name = tempfile.mktemp(suffix=".zip")
     with zipfile.ZipFile(zip_name, 'w') as zipf:
         # Criar uma pasta temporária para armazenar os PDFs
