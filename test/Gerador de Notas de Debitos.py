@@ -235,7 +235,7 @@ def gerar_pdfs():
     if df_global is not None:
         zip_path = gerar_zip_com_pdfs(df_global)
         with open(zip_path, "rb") as f:
-            zip_file_name = filedialog.asksaveasfilename(defaultextension=".zip", filetypes=[("ZIP Files", "*.zip")])
+            zip_file_name = filedialog.asksaveasfilename(defaultextension=".zip", filetypes=[("ZIP Files", "*.zip")],initialfile=f"NOTAS_DEBITO_{mes_ano}.zip")
             if zip_file_name:
                 with open(zip_file_name, "wb") as output_file:
                     output_file.write(f.read())
