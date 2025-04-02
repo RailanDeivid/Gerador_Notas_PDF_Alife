@@ -297,13 +297,13 @@ if arquivo:
                     # Se apenas uma loja for selecionada, gera um único PDF
                     loja = selecao[0]
                     row = df[df['LOJA'] == loja].iloc[0]
-                    pdf_path = gerar_pdf(row, f"NOTA_DÉBITO_{row['LOJA']} {numero_nota}_{mes_ano}")
+                    pdf_path = gerar_pdf(row, f"NOTA_DÉBITO_{row['LOJA']} {numero_nota-1}_{mes_ano}")
 
                     with open(pdf_path, "rb") as f:
                         st.download_button(
-                            label=f"Baixar Nota de Débito - {loja} {numero_nota}_{mes_ano}",
+                            label=f"Baixar Nota de Débito - {loja} {numero_nota-1}_{mes_ano}",
                             data=f,
-                            file_name=f"NOTA DÉBITO - {loja} {numero_nota}_{mes_ano}.pdf",
+                            file_name=f"NOTA DÉBITO - {loja} {numero_nota-1}_{mes_ano}.pdf",
                             mime="application/pdf"
                         )
                 
