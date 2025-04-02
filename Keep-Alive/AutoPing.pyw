@@ -5,7 +5,7 @@ import time
 def keep_awake():
     while True:
         try:
-            requests.get("https://https://geradornotas.streamlit.app/")  
+            requests.get("https://geradornotas.streamlit.app/")  
         except Exception as e:
             print(f"Erro ao tentar manter ativo: {e}")
         time.sleep(600)  
