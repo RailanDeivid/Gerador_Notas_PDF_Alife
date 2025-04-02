@@ -188,16 +188,15 @@ def gerar_pdf(dados, nome_arquivo):
 
 # ------------------------- Função para gerar um arquivo ZIP contendo todos os PDFs
 def gerar_zip_com_pdfs(df):
-    numero_nota_str = str(numero_nota).zfill(5) 
     zip_name = tempfile.mktemp(suffix=".zip")
     with zipfile.ZipFile(zip_name, 'w') as zipf:
         # Criar uma pasta temporária para armazenar os PDFs
         os.makedirs('temp_pdfs', exist_ok=True)
         
         for index, row in df.iterrows():
-            pdf_path = gerar_pdf(row, f"NOTA_DÉBITO_{row['LOJA']} {numero_nota_str}_{mes_ano}")
+            pdf_path = gerar_pdf(row, f"NOTA_DÉBITO_{row['LOJA']} {numero_nota}_{mes_ano}")
             # Adicionar cada PDF ao arquivo zip com o nome desejado
-            zipf.write(pdf_path, f"NOTA DÉBITO - {row['LOJA']} {numero_nota_str}_{mes_ano}.pdf")
+            zipf.write(pdf_path, f"NOTA DÉBITO - {row['LOJA']} {numero_nota}_{mes_ano}.pdf")
             os.remove(pdf_path)  # Remover o arquivo PDF após adicionar ao ZIP
         
         # Após criar o zip, exclui a pasta temporária e seus arquivos
@@ -282,7 +281,7 @@ if arquivo:
 
     # Agora, exibe o botão "Gerar PDF" após o número ser inserido ou caso não queira inserir
     if st.button("Gerar PDF"):
-        numero_nota_str = str(numero_nota).zfill(5) 
+        
         if not df.empty:
             if opcao == "Gerar todos os PDFs":
                 zip_path = gerar_zip_com_pdfs(df)
@@ -298,13 +297,13 @@ if arquivo:
                     # Se apenas uma loja for selecionada, gera um único PDF
                     loja = selecao[0]
                     row = df[df['LOJA'] == loja].iloc[0]
-                    pdf_path = gerar_pdf(row, f"NOTA_DÉBITO_{row['LOJA']} {numero_nota_str}_{mes_ano}")
+                    pdf_path = gerar_pdf(row, f"NOTA_DÉBITO_{row['LOJA']} {numero_nota}_{mes_ano}")
 
                     with open(pdf_path, "rb") as f:
                         st.download_button(
-                            label=f"Baixar Nota de Débito - {loja} {numero_nota_str}_{mes_ano}",
+                            label=f"Baixar Nota de Débito - {loja} {numero_nota}_{mes_ano}",
                             data=f,
-                            file_name=f"NOTA DÉBITO - {loja} {numero_nota_str}_{mes_ano}.pdf",
+                            file_name=f"NOTA DÉBITO - {loja} {numero_nota}_{mes_ano}.pdf",
                             mime="application/pdf"
                         )
                 
@@ -315,7 +314,7 @@ if arquivo:
                     with zipfile.ZipFile(zip_path, "w") as zipf:
                         for loja in selecao:
                             row = df[df['LOJA'] == loja].iloc[0]
-                            pdf_filename = f"NOTA DÉBITO - {loja} {numero_nota_str}_{mes_ano}.pdf"  # Nome do PDF no ZIP
+                            pdf_filename = f"NOTA DÉBITO - {loja} {numero_nota}_{mes_ano}.pdf"  # Nome do PDF no ZIP
                             pdf_path = gerar_pdf(row, pdf_filename)  # Gera o PDF com o nome correto
                             
                             zipf.write(pdf_path, pdf_filename)  # Adiciona ao ZIP com o nome correto
