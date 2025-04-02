@@ -213,11 +213,6 @@ with open(logo_path, "rb") as img_file:
 st.set_page_config(page_title="Gerador de Notas de Débito em PDF",
                    page_icon=logo_bytes, layout="wide", initial_sidebar_state="expanded")
 
-# Inicializar o número da nota no session_state
-if "numero_nota" not in st.session_state:
-    st.session_state.numero_nota = carregar_numero_nota()
-
-st.write(f"Número da Nota Atual: {st.session_state.numero_nota}")
 
 # Setar título
 st.markdown("""
