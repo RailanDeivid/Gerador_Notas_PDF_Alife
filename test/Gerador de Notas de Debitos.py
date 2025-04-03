@@ -14,7 +14,12 @@ from datetime import datetime, timedelta
 
 mes_ano =  (datetime.now().replace(day=1) - timedelta(days=1)).strftime("%m%Y")
 # Caminho do arquivo onde o número da nota será armazenado
-ARQUIVO_NUMERO_NOTA = "NFNumber.txt"
+
+# Definir o caminho correto para armazenar o arquivo
+APP_DIR = os.path.join(os.environ["USERPROFILE"], "Gerador Notas")
+os.makedirs(APP_DIR, exist_ok=True)  # Criar pasta se não existir
+
+ARQUIVO_NUMERO_NOTA = os.path.join(APP_DIR, "NFNumber.txt")
 
 # Função para ler o número da nota do arquivo (ou iniciar em 1 caso não exista)
 def carregar_numero_nota():
@@ -42,8 +47,6 @@ def gerar_pdf(dados, nome_arquivo):
     
     global numero_nota  # Usa a variável global
     
-    # Garantir que o diretório temp_pdfs exista
-    os.makedirs('temp_pdfs', exist_ok=True)
     # Configuração da página
     pdf = FPDF(orientation='L', unit='mm', format='A4')  
     pdf.set_auto_page_break(auto=True, margin=15)
@@ -188,25 +191,35 @@ def gerar_pdf(dados, nome_arquivo):
     
     
     # Salvar o PDF temporariamente
-    temp_pdf = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf", dir="temp_pdfs")
+    # Definir o diretório de trabalho no AppData
+    APP_DIR = os.path.join(os.environ["LOCALAPPDATA"], "Gerador_de_Notas_de_Debitos")
+    TEMP_DIR = os.path.join(APP_DIR, "temp_pdfs")
+    # Criar as pastas, se não existirem
+    os.makedirs(TEMP_DIR, exist_ok=True)
+    # Salvar o PDF temporariamente na pasta correta
+    temp_pdf = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf", dir=TEMP_DIR)
     pdf.output(temp_pdf.name)
     return temp_pdf.name
 
 # ------------------------- Função para gerar um arquivo ZIP contendo todos os PDFs
 def gerar_zip_com_pdfs(df):
-    zip_name = tempfile.mktemp(suffix=".zip")
+    # Criar uma pasta temporária segura no diretório do usuário
+    APP_DIR = os.path.join(os.environ["LOCALAPPDATA"], "Gerador_de_Notas_de_Debitos")
+    TEMP_DIR = os.path.join(APP_DIR, "temp_pdfs")
+    os.makedirs(TEMP_DIR, exist_ok=True)  # Garantir que a pasta exista
+
+    zip_name = tempfile.mktemp(suffix=".zip", dir=APP_DIR)
+    
     with zipfile.ZipFile(zip_name, 'w') as zipf:
-        # Criar uma pasta temporária para armazenar os PDFs
-        os.makedirs('temp_pdfs', exist_ok=True)
-        
         for index, row in df.iterrows():
-            pdf_path = gerar_pdf(row, f"NOTA_DÉBITO_{row['LOJA']} {numero_nota-1}_{mes_ano}")
-            # Adicionar cada PDF ao arquivo zip com o nome desejado
+            pdf_path = gerar_pdf(row, os.path.join(TEMP_DIR, f"NOTA_DÉBITO_{row['LOJA']} {numero_nota-1}_{mes_ano}.pdf"))
+            
+            # Adicionar PDF ao ZIP
             zipf.write(pdf_path, f"NOTA DÉBITO - {row['LOJA']} {numero_nota-1}_{mes_ano}.pdf")
-            os.remove(pdf_path)  # Remover o arquivo PDF após adicionar ao ZIP
+            os.remove(pdf_path)  # Remover o arquivo PDF após adicioná-lo ao ZIP
         
-        # Após criar o zip, exclui a pasta temporária e seus arquivos
-        shutil.rmtree('temp_pdfs')
+        # Remover a pasta temporária após a criação do ZIP
+        shutil.rmtree(TEMP_DIR)
     
     return zip_name
 
@@ -279,6 +292,9 @@ def selecionar_tipo_geracao():
                 messagebox.showerror("Erro", "Nenhuma loja foi selecionada.")
                 return
 
+            TEMP_DIR = os.path.join(tempfile.gettempdir(), "Gerador_Notas_Temp")
+            os.makedirs(TEMP_DIR, exist_ok=True)  # Cria pasta temporária
+
             if len(lojas_selecionadas) == 1:
                 loja = lojas_selecionadas[0]
                 loja_df = df_global[df_global['LOJA'] == loja]
@@ -287,17 +303,16 @@ def selecionar_tipo_geracao():
                     messagebox.showerror("Erro", f"Dados não encontrados para a loja {loja}.")
                 else:
                     pdf_path = gerar_pdf(loja_df.iloc[0], f"NOTA_DÉBITO_{loja}")
-                    pdf_file_name = filedialog.asksaveasfilename(defaultextension=".pdf",
-                                                                  filetypes=[("PDF Files", "*.pdf")],
-                                                                  initialfile=f"NOTA DÉBITO - {loja} {numero_nota-1}_{mes_ano}.pdf")
+                    pdf_file_name = filedialog.asksaveasfilename(
+                        defaultextension=".pdf",
+                        filetypes=[("PDF Files", "*.pdf")],
+                        initialfile=f"NOTA DÉBITO - {loja} {numero_nota-1}_{mes_ano}.pdf"
+                    )
                     if pdf_file_name:
                         shutil.move(pdf_path, pdf_file_name)
                         messagebox.showinfo("Sucesso", "PDF gerado com sucesso!")
 
             else:
-                pasta_temp = "pdf_temp"
-                os.makedirs(pasta_temp, exist_ok=True)
-                
                 for loja in lojas_selecionadas:
                     loja_df = df_global[df_global['LOJA'] == loja]
                     if loja_df.empty:
@@ -305,17 +320,20 @@ def selecionar_tipo_geracao():
                         continue
                     
                     pdf_path = gerar_pdf(loja_df.iloc[0], f"NOTA_DÉBITO_{loja}")
-                    shutil.move(pdf_path, os.path.join(pasta_temp, f"NOTA DÉBITO - {loja} {numero_nota-1}_{mes_ano}.pdf"))
+                    shutil.move(pdf_path, os.path.join(TEMP_DIR, f"NOTA DÉBITO - {loja} {numero_nota-1}_{mes_ano}.pdf"))
 
-                zip_file_name = filedialog.asksaveasfilename(defaultextension=".zip",
-                                                             filetypes=[("ZIP Files", "*.zip")],
-                                                             initialfile=f"NOTAS_DEBITO_{mes_ano}.zip")
+                zip_file_name = filedialog.asksaveasfilename(
+                    defaultextension=".zip",
+                    filetypes=[("ZIP Files", "*.zip")],
+                    initialfile=f"NOTAS_DEBITO_{mes_ano}.zip"
+                )
+
                 if zip_file_name:
                     with zipfile.ZipFile(zip_file_name, 'w', zipfile.ZIP_DEFLATED) as zipf:
-                        for pdf_file in os.listdir(pasta_temp):
-                            zipf.write(os.path.join(pasta_temp, pdf_file), pdf_file)
+                        for pdf_file in os.listdir(TEMP_DIR):
+                            zipf.write(os.path.join(TEMP_DIR, pdf_file), pdf_file)
                     
-                    shutil.rmtree(pasta_temp)
+                    shutil.rmtree(TEMP_DIR)  # Remover arquivos temporários
                     messagebox.showinfo("Sucesso", "ZIP gerado com sucesso!")
 
             loja_window.destroy()
