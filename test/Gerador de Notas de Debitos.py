@@ -235,12 +235,20 @@ def carregar_arquivo():
         if df_global.empty:
             messagebox.showerror("Erro", "O arquivo Excel está vazio. Verifique os dados.")
         else:
+            colunas_necessarias_com_dados = ["LOJA", "CNPJ", "ENDEREÇO", "CEP","EMAIL", "VALOR", "DATA DE EMISSÃO", "DATA DE PAGAMENTO"]
             colunas_necessarias = ["LOJA", "CNPJ", "ENDEREÇO", "CEP", "EMAIL", "VALOR", "DATA DE EMISSÃO", "DATA DE PAGAMENTO"]
+            
             colunas_faltando = [col for col in colunas_necessarias if col not in df_global.columns]
             if colunas_faltando:
-                messagebox.showerror("Erro", f"Faltam as seguintes colunas: {', '.join(colunas_faltando)}.")
+                messagebox.showerror("Erro", f"Faltam as seguintes colunas: {', '.join(colunas_faltando)}. Corrija os dados e reenvie o arquivo.")
             else:
-                messagebox.showinfo("Sucesso", "Arquivo carregado com sucesso!")
+                # Verifica se há valores nulos nas colunas obrigatórias
+                colunas_com_nulos = [col for col in colunas_necessarias_com_dados if df_global[col].isna().sum() > 0]
+                if colunas_com_nulos:
+                    messagebox.showerror("Erro", f"As seguintes colunas possuem valores ausentes: {', '.join(colunas_com_nulos)}. Corrija os dados e reenvie o arquivo.")
+                else:
+                    messagebox.showinfo("Sucesso", "Arquivo carregado com sucesso!")
+
 
 # Função para gerar PDFs
 def gerar_pdfs():
@@ -402,7 +410,7 @@ def selecionar_tipo_geracao():
 
 tk_root = tk.Tk()
 tk_root.title("Gerador de Notas de Débito em PDF")
-tk_root.geometry("400x200")
+tk_root.geometry("400x250")
 # # Carregar logo
 # logo = tk.PhotoImage(file="logo Alife.png")  
 # logo_label = tk.Label(tk_root, image=logo, bg=tema_fundo)
@@ -424,8 +432,6 @@ tk_root.geometry(f"{largura_janela}x{altura_janela}+{x}+{y}")
 tk_root.configure(bg=tema_fundo)
 frame = tk.Frame(tk_root, bg=tema_fundo)
 frame.pack(padx=10, pady=10)
-
-
 
 # Título
 titulo_label = tk.Label(frame, text="Gerador de Notas de Débito", font=("Arial", 16, "bold"), bg=tema_fundo, fg=tema_texto)
