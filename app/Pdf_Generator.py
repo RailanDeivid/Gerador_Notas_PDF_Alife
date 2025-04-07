@@ -95,7 +95,7 @@ def gerar_pdf(dados, nome_arquivo):
     pdf.set_xy(230, 50) 
     pdf.cell(60, 10, f"{dados['DATA DE PAGAMENTO'].strftime('%d/%m/%Y')}", border=1, ln=True, align='C')
     pdf.set_xy(230, 60) 
-    pdf.cell(60, 10, "Extras", border=1, ln=True, align='C')
+    pdf.cell(60, 10, f"{dados['DESCRIÇÃO']}", border=1, ln=True, align='C')
     pdf.set_xy(230, 70) 
     pdf.cell(60, 10, "À Vista", border=1, ln=True, align='C')
     pdf.ln(20)
@@ -155,13 +155,13 @@ def gerar_pdf(dados, nome_arquivo):
     pdf.set_font("Arial", "", 11)
     pdf.cell(30, 5, "1", ln=True, align='C', border=1)
     pdf.set_xy(40, 181) 
-    pdf.cell(40, 5, "Extras", ln=True, align='C', border=1)
+    pdf.cell(40, 5, f"{dados['DESCRIÇÃO']}", ln=True, align='C', border=1)
     pdf.set_xy(80, 181) 
     pdf.cell(30, 5, "1", ln=True, align='C', border=1)
     pdf.set_xy(110, 181) 
     pdf.cell(30, 5, "1", ln=True, align='C', border=1)
     pdf.set_xy(140, 181) 
-    pdf.cell(50, 5, "Extras", ln=True, align='C', border=1)
+    pdf.cell(50, 5, f"{dados['PRESTADOR DE SERVIÇO']}", ln=True, align='C', border=1)
     pdf.set_xy(190, 181)
     valor_formatado = f"R$ {dados['VALOR']:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
     pdf.cell(40, 5, valor_formatado, ln=True, align='C', border=1)
@@ -247,8 +247,8 @@ if arquivo:
         st.error("O arquivo Excel está vazio. Por favor, verifique os dados.")
     else:
         # Define as colunas necessárias
-        colunas_necessarias = ["LOJA", "CNPJ", "ENDEREÇO", "CEP", "EMAIL", "VALOR", "DATA DE EMISSÃO", "DATA DE PAGAMENTO"] 
-        colunas_necessarias_com_dados = ["LOJA", "CNPJ", "ENDEREÇO", "CEP", "VALOR", "DATA DE EMISSÃO", "DATA DE PAGAMENTO"] 
+        colunas_necessarias = ["LOJA", "CNPJ", "ENDEREÇO", "CEP", "EMAIL", "VALOR", "DATA DE EMISSÃO", "DATA DE PAGAMENTO", 'PRESTADOR DE SERVIÇO','DESCRIÇÃO'] 
+        colunas_necessarias_com_dados = ["LOJA", "CNPJ", "ENDEREÇO", "CEP", "VALOR", "DATA DE EMISSÃO", "DATA DE PAGAMENTO",'PRESTADOR DE SERVIÇO','DESCRIÇÃO'] 
         # Verifica se todas as colunas necessárias estão presentes no DataFrame
         colunas_faltando = [col for col in colunas_necessarias if col not in df.columns]
         if colunas_faltando:
