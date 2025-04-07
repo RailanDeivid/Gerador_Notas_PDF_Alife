@@ -137,6 +137,7 @@ def gerar_pdf(dados, nome_arquivo):
     pdf.set_fill_color(218, 255, 183) 
     
     # Cabeçalhos da tabela Inferior
+    pdf.set_font("Arial", "", 11)
     pdf.cell(30, 5, "Item", ln=True, align='C', border=1, fill=True)
     pdf.set_xy(40, 176) 
     pdf.cell(40, 5, "Descrição", ln=True, align='C', border=1, fill=True)
@@ -152,7 +153,7 @@ def gerar_pdf(dados, nome_arquivo):
     pdf.cell(60, 5, "Observações", ln=True, align='C', border=1, fill=True)
     
     # Valores tabela Inferior
-    pdf.set_font("Arial", "", 11)
+    pdf.set_font("Arial", "", 10)
     pdf.cell(30, 5, "1", ln=True, align='C', border=1)
     pdf.set_xy(40, 181) 
     pdf.cell(40, 5, f"{dados['DESCRIÇÃO']}", ln=True, align='C', border=1)
